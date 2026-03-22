@@ -41,7 +41,7 @@
     "test:e2e:sft:insp:task": "npx tsx tests/e2e/sftInspTask.spec.ts",
     "test:e2e:sft:danger:plan": "npx tsx tests/e2e/sftDangerPlan.spec.ts",
     "test:e2e:sft:data:alarm2": "npx tsx tests/e2e/sftDataAlarm2.spec.ts",
-    "test:e2e:sft:emerresour:team": "npx tsx tests/e2e/sftEmerresourTeam.spec.ts",
+    "test:e2e:sft:emerresour:team:index": "npx tsx tests/e2e/sftEmerresourTeam.spec.ts",
     "test:e2e:sft:cont:manage:examinecont": "npx tsx tests/e2e/sftContManageExamine.spec.ts",
     "test:e2e:sft:emerresour:ep": "npx tsx tests/e2e/sftEmerresourEp.spec.ts",
     "test:e2e:sft:work:doc:pl": "npx tsx tests/e2e/sftWorkDocPl.spec.ts",
