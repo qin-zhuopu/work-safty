@@ -19,6 +19,15 @@ export default {
         title: "文档摄像头",
         showLink: true
       }
+    },
+    {
+      path: "/work/period/index",
+      name: "WorkPeriod",
+      component: () => import("@/views/work/period/index.vue"),
+      meta: {
+        title: "特殊时段",
+        showLink: true
+      }
     }
   ]
 } satisfies RouteConfigsTable;

@@ -25,6 +25,7 @@
     "test:e2e:data:gds:index2": "npx tsx tests/e2e/dataGdsIndex2.spec.ts",
     "test:e2e:sys:acl:index": "npx tsx tests/e2e/sysAcl.spec.ts",
     "test:e2e:sys:role:index": "npx tsx tests/e2e/sysRole.spec.ts",
+    "test:e2e:work:period:index": "npx tsx tests/e2e/workPeriod.spec.ts",
     "prepare": "husky",
     "preinstall": "npx only-allow pnpm"
   },
