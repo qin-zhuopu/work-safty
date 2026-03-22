@@ -66,6 +66,7 @@
     "test:e2e:sft:am:am": "npx tsx tests/e2e/sftAmAm.spec.ts",
     "test:e2e:sft:danger:check": "npx tsx tests/e2e/sftDangerCheck.spec.ts",
     "test:e2e:sft:work:special": "npx tsx tests/e2e/sftWorkSpecial.spec.ts",
+    "test:e2e:sft:cont:special": "npx tsx tests/e2e/sftContSpecial.spec.ts",
     "prepare": "husky",
     "preinstall": "npx only-allow pnpm"
   },
