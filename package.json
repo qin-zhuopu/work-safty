@@ -26,6 +26,7 @@
     "test:e2e:sys:acl:index": "npx tsx tests/e2e/sysAcl.spec.ts",
     "test:e2e:sys:role:index": "npx tsx tests/e2e/sysRole.spec.ts",
     "test:e2e:work:period:index": "npx tsx tests/e2e/workPeriod.spec.ts",
+    "test:e2e:train:pc:record:learn": "npx tsx tests/e2e/train/pc/record/learn.spec.ts",
     "prepare": "husky",
     "preinstall": "npx only-allow pnpm"
   },

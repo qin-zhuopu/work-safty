@@ -19,6 +19,15 @@ export default {
         title: "培训类型管理",
         showLink: true
       }
+    },
+    {
+      path: "/train/pc/record/learn/index",
+      name: "TrainPcRecordLearn",
+      component: () => import("@/views/train/pc/record/learn/index.vue"),
+      meta: {
+        title: "学习记录",
+        showLink: true
+      }
     }
   ]
 } satisfies RouteConfigsTable;
