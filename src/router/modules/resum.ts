@@ -14,7 +14,7 @@ export default {
     {
       path: "/resum/plan/stat",
       name: "ResumPlanStat",
-      component: () => import("@/views/resum/plan/stat.vue"),
+      component: () => import("@/views/resum/plan/stat/index.vue"),
       meta: {
         title: "排查计划统计",
         showLink: true
