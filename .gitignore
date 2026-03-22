@@ -24,3 +24,4 @@ tsconfig.tsbuildinfo
 .claude-trace
 files
 screenshots
+*.tgz
