@@ -1,29 +1,36 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, reactive } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import type { FormInstance } from "element-plus";
+import dayjs from "dayjs";
 
 defineOptions({
   name: "SftInspCl"
 });
 
+interface AddUser {
+  id: number;
+  ushow: string;
+}
+
 interface ListItem {
   id: number;
   deptName: string;
-  field: string; // 手机型号
-  field1: string; // 原IMEI1
-  field2: string; // 原IMEI2
-  field3: string; // 故障描述
+  field: string; // 原手机型号
+  field1: string; // 原手机序列号1
+  field2: string; // 原手机序列号2
+  field3: string; // 更换原因
   field4: string; // 新手机型号
-  field5: string; // 新IMEI1
-  field6: string; // 新IMEI2
-  field7: number; // 更换日期
-  field8: string; // 领用人
-  field9: string; // 联系电话
-  field10: string; // 经办人
-  field11: string; // 处理方式
-  field12: string; // 备注
-  field13: string; // 备用字段
+  field5: string; // 新手机序列号1
+  field6: string; // 新手机序列号2
+  field7: number; // 申请时间
+  field8: string; // 申请人
+  field9: string; // 申请人电话
+  field10: string; // 处理人
+  field11: string; // 返厂维修/报废
+  field12: string; // 处理结果
+  field13: string; // 物联网卡号
+  addDate: number;
+  addUser: AddUser;
 }
 
 interface ApiResponse {
@@ -36,38 +43,31 @@ interface ApiResponse {
 
 const tableData = ref<ListItem[]>([]);
 const loading = ref(false);
-const searchForm = ref({
-  deptName: ""
+const pagination = reactive({
+  page: 1,
+  size: 10,
+  total: 0
+});
+const searchForm = reactive({
+  name: ""
 });
 const multipleSelection = ref<ListItem[]>([]);
 const dialogVisible = ref(false);
 const dialogTitle = ref("添加");
-const dialogFormRef = ref<FormInstance>();
-const dialogForm = ref<Partial<ListItem>>({
-  deptName: "",
-  field: "",
-  field1: "",
-  field2: "",
-  field3: "",
-  field4: "",
-  field5: "",
-  field6: "",
-  field7: Date.now(),
-  field8: "",
-  field9: "",
-  field10: "",
-  field11: "",
-  field12: "",
-  field13: ""
-});
 
 async function fetchData() {
   loading.value = true;
   try {
-    const response = await fetch("/sft/insp/cl/list.json");
+    const params = new URLSearchParams({
+      page: String(pagination.page - 1),
+      size: String(pagination.size),
+      ...(searchForm.name ? { name: searchForm.name } : {})
+    });
+    const response = await fetch(`/sft/insp/cl/list.json?${params}`);
     const data: ApiResponse = await response.json();
     if (data.success) {
       tableData.value = data.t.content;
+      pagination.total = data.t.totalElements;
     } else {
       ElMessage.error("获取数据失败");
     }
@@ -80,40 +80,36 @@ async function fetchData() {
 }
 
 function handleSearch() {
+  pagination.page = 1;
   fetchData();
 }
 
 function handleReset() {
-  searchForm.value.deptName = "";
+  searchForm.name = "";
+  pagination.page = 1;
+  fetchData();
+}
+
+function handlePageChange(page: number) {
+  pagination.page = page;
+  fetchData();
+}
+
+function handleSizeChange(size: number) {
+  pagination.size = size;
+  pagination.page = 1;
   fetchData();
 }
 
 function handleAdd() {
   dialogTitle.value = "添加";
-  dialogForm.value = {
-    deptName: "",
-    field: "",
-    field1: "",
-    field2: "",
-    field3: "",
-    field4: "",
-    field5: "",
-    field6: "",
-    field7: Date.now(),
-    field8: "",
-    field9: "",
-    field10: "",
-    field11: "",
-    field12: "",
-    field13: ""
-  };
   dialogVisible.value = true;
 }
 
 function handleEdit(row: ListItem) {
   dialogTitle.value = "编辑";
-  dialogForm.value = { ...row };
   dialogVisible.value = true;
+  ElMessage.info(`编辑: ${row.deptName}`);
 }
 
 function handleDelete(row: ListItem) {
@@ -135,7 +131,7 @@ function handleSelectionChange(val: ListItem[]) {
 
 function handleDelAll() {
   if (multipleSelection.value.length === 0) {
-    ElMessage.warning("请选择要删除的记录");
+    ElMessage.warning("请选择要删除的台账！");
     return;
   }
   ElMessageBox.confirm(
@@ -155,6 +151,10 @@ function handleDelAll() {
     .catch(() => {});
 }
 
+function handleDownloadTemplate() {
+  ElMessage.info("下载模板功能开发中");
+}
+
 function handleImport() {
   ElMessage.info("导入功能开发中");
 }
@@ -163,37 +163,8 @@ function handleExport() {
   ElMessage.info("导出功能开发中");
 }
 
-function handleDownloadTemplate() {
-  ElMessage.info("下载模板功能开发中");
-}
-
-function submitDialog() {
-  dialogFormRef.value?.validate(valid => {
-    if (valid) {
-      if (dialogTitle.value === "添加") {
-        tableData.value.unshift({
-          ...(dialogForm.value as ListItem),
-          id: Date.now(),
-          addDate: Date.now()
-        } as any);
-        ElMessage.success("添加成功");
-      } else {
-        const index = tableData.value.findIndex(
-          item => item.id === dialogForm.value.id
-        );
-        if (index !== -1) {
-          tableData.value[index] = { ...dialogForm.value } as ListItem;
-          ElMessage.success("编辑成功");
-        }
-      }
-      dialogVisible.value = false;
-    }
-  });
-}
-
-function formatDate(timestamp: number) {
-  if (!timestamp) return "";
-  return new Date(timestamp).toLocaleDateString("zh-CN");
+function formatDate(timestamp: number): string {
+  return timestamp ? dayjs(timestamp).format("YYYY-MM-DD") : "";
 }
 
 onMounted(() => {
@@ -211,25 +182,31 @@ onMounted(() => {
       </template>
 
       <!-- 搜索表单 -->
-      <div class="search-form">
+      <div class="search-form mb-4">
         <el-form :inline="true" :model="searchForm">
           <el-form-item label="部门">
             <el-input
-              v-model="searchForm.deptName"
+              v-model="searchForm.name"
               placeholder="请输入部门"
               clearable
               style="width: 200px"
             />
           </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="handleSearch">
+              <el-icon><Search /></el-icon>
+              查询
+            </el-button>
+            <el-button @click="handleReset">
+              <el-icon><Refresh /></el-icon>
+              重置
+            </el-button>
+          </el-form-item>
         </el-form>
-        <el-button type="primary" size="small" @click="handleSearch">
-          <el-icon><Search /></el-icon>
-          查询
-        </el-button>
-        <el-button size="small" @click="handleReset">
-          <el-icon><RefreshLeft /></el-icon>
-          重置
-        </el-button>
+      </div>
+
+      <!-- 操作按钮 -->
+      <div class="mb-4 flex flex-wrap gap-2">
         <el-button type="primary" size="small" @click="handleAdd">
           <el-icon><Plus /></el-icon>
           添加
@@ -258,34 +235,30 @@ onMounted(() => {
         :data="tableData"
         stripe
         border
-        style="width: 100%; margin-top: 16px"
+        style="width: 100%"
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="55" align="center" />
         <el-table-column type="index" label="序号" width="60" align="center" />
         <el-table-column prop="deptName" label="部门" min-width="150" />
-        <el-table-column prop="field" label="手机型号" min-width="150" />
-        <el-table-column prop="field1" label="原IMEI1" width="160" />
-        <el-table-column prop="field2" label="原IMEI2" width="160" />
-        <el-table-column prop="field3" label="故障描述" min-width="120" />
+        <el-table-column prop="field" label="原手机型号" min-width="150" />
+        <el-table-column prop="field1" label="原手机序列号1" width="160" />
+        <el-table-column prop="field2" label="原手机序列号2" width="160" />
+        <el-table-column prop="field3" label="更换原因" min-width="120" />
         <el-table-column prop="field4" label="新手机型号" min-width="150" />
-        <el-table-column prop="field5" label="新IMEI1" width="160" />
-        <el-table-column prop="field6" label="新IMEI2" width="160" />
-        <el-table-column
-          prop="field7"
-          label="更换日期"
-          width="120"
-          align="center"
-        >
+        <el-table-column prop="field5" label="新手机序列号1" width="160" />
+        <el-table-column prop="field6" label="新手机序列号2" width="160" />
+        <el-table-column prop="field13" label="物联网卡号" width="140" />
+        <el-table-column label="申请时间" width="120" align="center">
           <template #default="{ row }">
             {{ formatDate(row.field7) }}
           </template>
         </el-table-column>
-        <el-table-column prop="field8" label="领用人" width="100" />
-        <el-table-column prop="field9" label="联系电话" width="130" />
-        <el-table-column prop="field10" label="经办人" width="100" />
-        <el-table-column prop="field11" label="处理方式" width="120" />
-        <el-table-column prop="field12" label="备注" min-width="120" />
+        <el-table-column prop="field8" label="申请人" width="100" />
+        <el-table-column prop="field9" label="申请人电话" width="130" />
+        <el-table-column prop="field10" label="处理人" width="100" />
+        <el-table-column prop="field11" label="返厂维修/报废" width="130" />
+        <el-table-column prop="field12" label="处理结果" min-width="120" />
         <el-table-column label="操作" width="150" align="center" fixed="right">
           <template #default="{ row }">
             <el-button
@@ -307,84 +280,36 @@ onMounted(() => {
           </template>
         </el-table-column>
       </el-table>
+
+      <!-- 分页 -->
+      <div class="mt-4 flex justify-end">
+        <el-pagination
+          v-model:current-page="pagination.page"
+          v-model:page-size="pagination.size"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="pagination.total"
+          layout="total, sizes, prev, pager, next, jumper"
+          @current-change="handlePageChange"
+          @size-change="handleSizeChange"
+        />
+      </div>
     </el-card>
 
     <!-- 编辑对话框 -->
     <el-dialog
       v-model="dialogVisible"
       :title="dialogTitle"
-      width="600px"
+      width="60%"
       :close-on-click-modal="false"
     >
-      <el-form
-        ref="dialogFormRef"
-        :model="dialogForm"
-        label-width="100px"
-        label-position="right"
-      >
-        <el-form-item label="部门" prop="deptName" required>
-          <el-input v-model="dialogForm.deptName" placeholder="请输入部门" />
-        </el-form-item>
-        <el-form-item label="手机型号" prop="field" required>
-          <el-input v-model="dialogForm.field" placeholder="请输入手机型号" />
-        </el-form-item>
-        <el-form-item label="原IMEI1" prop="field1">
-          <el-input v-model="dialogForm.field1" placeholder="请输入原IMEI1" />
-        </el-form-item>
-        <el-form-item label="原IMEI2" prop="field2">
-          <el-input v-model="dialogForm.field2" placeholder="请输入原IMEI2" />
-        </el-form-item>
-        <el-form-item label="故障描述" prop="field3">
-          <el-input
-            v-model="dialogForm.field3"
-            type="textarea"
-            placeholder="请输入故障描述"
-          />
-        </el-form-item>
-        <el-form-item label="新手机型号" prop="field4">
-          <el-input
-            v-model="dialogForm.field4"
-            placeholder="请输入新手机型号"
-          />
-        </el-form-item>
-        <el-form-item label="新IMEI1" prop="field5">
-          <el-input v-model="dialogForm.field5" placeholder="请输入新IMEI1" />
-        </el-form-item>
-        <el-form-item label="新IMEI2" prop="field6">
-          <el-input v-model="dialogForm.field6" placeholder="请输入新IMEI2" />
-        </el-form-item>
-        <el-form-item label="更换日期" prop="field7">
-          <el-date-picker
-            v-model="dialogForm.field7"
-            type="date"
-            placeholder="选择日期"
-            style="width: 100%"
-            value-format="x"
-          />
-        </el-form-item>
-        <el-form-item label="领用人" prop="field8">
-          <el-input v-model="dialogForm.field8" placeholder="请输入领用人" />
-        </el-form-item>
-        <el-form-item label="联系电话" prop="field9">
-          <el-input v-model="dialogForm.field9" placeholder="请输入联系电话" />
-        </el-form-item>
-        <el-form-item label="经办人" prop="field10">
-          <el-input v-model="dialogForm.field10" placeholder="请输入经办人" />
-        </el-form-item>
-        <el-form-item label="处理方式" prop="field11">
-          <el-input v-model="dialogForm.field11" placeholder="请输入处理方式" />
-        </el-form-item>
-        <el-form-item label="备注" prop="field12">
-          <el-input
-            v-model="dialogForm.field12"
-            type="textarea"
-            placeholder="请输入备注"
-          />
-        </el-form-item>
-      </el-form>
+      <div class="text-center py-8 text-gray-500">
+        {{ dialogTitle }}表单内容待实现
+      </div>
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="submitDialog">确定</el-button>
+        <el-button type="primary" @click="dialogVisible = false"
+          >确定</el-button
+        >
       </template>
     </el-dialog>
   </div>
@@ -401,9 +326,8 @@ onMounted(() => {
 }
 
 .search-form {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
+  :deep(.el-form-item) {
+    margin-bottom: 0;
+  }
 }
 </style>
