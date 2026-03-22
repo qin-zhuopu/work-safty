@@ -72,6 +72,7 @@
     "test:e2e:sft:insp:record:index": "npx tsx tests/e2e/sftInspRecord.spec.ts",
     "test:e2e:sft:work:loc:statistics": "npx tsx tests/e2e/sftWorkLocStatistics.spec.ts",
     "test:e2e:sft:danger": "npx tsx tests/e2e/sftDanger.spec.ts",
+    "test:e2e:sft:danger:statistics": "npx tsx tests/e2e/sftDangerStatistics.spec.ts",
     "test:e2e:sft:train:plan:archives": "npx tsx tests/e2e/sftTrainPlanArchives.spec.ts",
     "test:e2e:sft:work:sheet:statistics": "npx tsx tests/e2e/sftWorkSheetStatistics.spec.ts",
     "test:e2e:sft:work:doc:statistics": "npx tsx tests/e2e/sftWorkDocStatistics.spec.ts",
