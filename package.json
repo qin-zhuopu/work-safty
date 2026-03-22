@@ -38,6 +38,7 @@
     "test:e2e:sft:data:gds:index": "npx tsx tests/e2e/sftDataGds.spec.ts",
     "test:e2e:sft:emerresour:config:index": "npx tsx tests/e2e/sftEmerresourConfig.spec.ts",
     "test:e2e:sft:work:data": "npx tsx tests/e2e/sftWorkData.spec.ts",
+    "test:e2e:sft:insp:plan": "npx tsx tests/e2e/sftInspPlan.spec.ts",
     "test:e2e:sft:insp:task": "npx tsx tests/e2e/sftInspTask.spec.ts",
     "test:e2e:sft:danger:plan": "npx tsx tests/e2e/sftDangerPlan.spec.ts",
     "test:e2e:sft:data:alarm2": "npx tsx tests/e2e/sftDataAlarm2.spec.ts",
