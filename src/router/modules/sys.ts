@@ -19,6 +19,15 @@ export default {
         title: "权限管理",
         showLink: true
       }
+    },
+    {
+      path: "/sys/role/index",
+      name: "SysRole",
+      component: () => import("@/views/sys/role/index.vue"),
+      meta: {
+        title: "角色管理",
+        showLink: true
+      }
     }
   ]
 } satisfies RouteConfigsTable;
