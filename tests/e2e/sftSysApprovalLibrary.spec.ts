@@ -117,8 +117,8 @@ async function testApprovalLibraryPage(page: Page): Promise<void> {
 
   // 6. 验证表头
   const headers = await page.locator(".el-table__header th").allTextContents();
-  console.log("表头列:", headers.filter(h => h.trim()).slice(0, 5));
-  expect(headers.some(h => h.includes("审批人员"))).toBeTruthy();
+  console.log("表头列:", headers.filter(h => h.trim()).slice(0, 6));
+  expect(headers.some(h => h.includes("人员"))).toBeTruthy();
   expect(headers.some(h => h.includes("类型"))).toBeTruthy();
 
   // 7. 验证第一行数据
@@ -146,7 +146,7 @@ async function testApprovalLibraryPage(page: Page): Promise<void> {
   await page.click(".el-select");
   await page.waitForTimeout(200);
   const option = page
-    .locator('.el-select-dropdown__item:has-text("属地部门负责人")')
+    .locator('.el-select-dropdown__item:has-text("HSE管理部审批")')
     .first();
   if (await option.isVisible({ timeout: 2000 })) {
     await option.click();

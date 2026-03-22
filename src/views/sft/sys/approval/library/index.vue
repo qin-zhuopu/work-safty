@@ -59,10 +59,8 @@ const pagination = reactive({
 
 const typeOptions = [
   { label: "请选择", value: "-1" },
-  { label: "属地部门负责人", value: "3" },
-  { label: "HSE部专业负责人", value: "4" },
-  { label: "主管部门专业负责人", value: "5" },
-  { label: "主管部门负责人", value: "6" }
+  { label: "HSE管理部审批", value: "1" },
+  { label: "公司领导审批", value: "2" }
 ];
 
 async function fetchData() {
@@ -140,12 +138,28 @@ function handleCurrentChange(page: number) {
 
 function getTypeName(type: number): string {
   const typeMap: Record<number, string> = {
-    3: "属地部门负责人",
-    4: "HSE部专业负责人",
-    5: "主管部门专业负责人",
-    6: "主管部门负责人"
+    1: "HSE管理部审批",
+    2: "公司领导审批"
   };
   return typeMap[type] || "";
+}
+
+function getStatusName(status: number): string {
+  const statusMap: Record<number, string> = {
+    1: "正常",
+    2: "冻结",
+    3: "删除"
+  };
+  return statusMap[status] || "";
+}
+
+function getStatusType(status: number): "" | "success" | "danger" | "info" {
+  const statusTypeMap: Record<number, "" | "success" | "danger" | "info"> = {
+    1: "success",
+    2: "danger",
+    3: "info"
+  };
+  return statusTypeMap[status] || "";
 }
 
 onMounted(() => {
@@ -216,34 +230,27 @@ onMounted(() => {
         <el-table-column type="index" label="序号" width="60" align="center" />
         <el-table-column
           prop="sysUser.ushow"
-          label="审批人员"
+          label="人员"
           min-width="120"
           align="center"
         />
         <el-table-column
           prop="sysUser.uname"
           label="账号"
-          min-width="120"
+          min-width="140"
           align="center"
         />
-        <el-table-column
-          prop="sysUser.telephone"
-          label="联系电话"
-          min-width="130"
-          align="center"
-        />
-        <el-table-column
-          prop="sysUser.job"
-          label="职位"
-          min-width="120"
-          align="center"
-        />
-        <el-table-column
-          prop="type"
-          label="类型"
-          min-width="180"
-          align="center"
-        >
+        <el-table-column label="人员状态" min-width="100" align="center">
+          <template #default="{ row }">
+            <el-tag
+              v-if="row.sysUser"
+              :type="getStatusType(row.sysUser.status)"
+            >
+              {{ getStatusName(row.sysUser.status) }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="类型" min-width="180" align="center">
           <template #default="{ row }">
             {{ getTypeName(row.type) }}
           </template>
