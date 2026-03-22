@@ -19,6 +19,15 @@ export default {
         title: "风险分级管控",
         showLink: true
       }
+    },
+    {
+      path: "/sft/risk/control/statistics",
+      name: "SftRiskControlStatistics",
+      component: () => import("@/views/sft/risk/control/statistics.vue"),
+      meta: {
+        title: "隐患排查统计",
+        showLink: true
+      }
     }
   ]
 } satisfies RouteConfigsTable;

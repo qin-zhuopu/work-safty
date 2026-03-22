@@ -55,6 +55,7 @@
     "test:e2e:sft:emerresour:fp": "npx tsx tests/e2e/sftEmerresourFp.spec.ts",
     "test:e2e:sft:train:plan": "npx tsx tests/e2e/sftTrainPlan.spec.ts",
     "test:e2e:sft:risk:control": "npx tsx tests/e2e/sftRiskControl.spec.ts",
+    "test:e2e:sft:risk:control:statistics": "npx tsx tests/e2e/sftRiskControlStatistics.spec.ts",
     "test:e2e:sft:work:sheet": "npx tsx tests/e2e/sftWorkSheet.spec.ts",
     "test:e2e:sft:train:pc:learn:file": "npx tsx tests/e2e/sftTrainPcLearnFile.spec.ts",
     "test:e2e:sft:behavior:safe": "npx tsx tests/e2e/sftBehaviorSafe.spec.ts",
