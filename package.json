@@ -69,6 +69,7 @@
     "test:e2e:sft:work:special": "npx tsx tests/e2e/sftWorkSpecial.spec.ts",
     "test:e2e:sft:cont:special": "npx tsx tests/e2e/sftContSpecial.spec.ts",
     "test:e2e:sft:train:matrix": "npx tsx tests/e2e/sftTrainMatrix.spec.ts",
+    "test:e2e:sft:insp:record:index": "npx tsx tests/e2e/sftInspRecord.spec.ts",
     "prepare": "husky",
     "preinstall": "npx only-allow pnpm"
   },
