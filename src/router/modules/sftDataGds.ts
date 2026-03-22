@@ -19,6 +19,15 @@ export default {
         title: "监测报警数据",
         showLink: true
       }
+    },
+    {
+      path: "/sft/data/gds/index2",
+      name: "SftDataGdsIndex2",
+      component: () => import("@/views/sft/data/gds/index2.vue"),
+      meta: {
+        title: "管道设备监测数据",
+        showLink: true
+      }
     }
   ]
 } satisfies RouteConfigsTable;

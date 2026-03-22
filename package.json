@@ -40,6 +40,7 @@
     "test:e2e:sft:cont:per:hmd": "npx tsx tests/e2e/sftContPerHmd.spec.ts",
     "test:e2e:sft:cont:manage:hmd": "npx tsx tests/e2e/sftContManageHmd.spec.ts",
     "test:e2e:sft:data:gds:index": "npx tsx tests/e2e/sftDataGds.spec.ts",
+    "test:e2e:sft:data:gds:index2": "npx tsx tests/e2e/sft-data-gds-index2.spec.ts",
     "test:e2e:sft:emerresour:config:index": "npx tsx tests/e2e/sftEmerresourConfig.spec.ts",
     "test:e2e:sft:work:data": "npx tsx tests/e2e/sftWorkData.spec.ts",
     "test:e2e:sft:insp:plan": "npx tsx tests/e2e/sftInspPlan.spec.ts",
