@@ -23,7 +23,7 @@ export default {
     {
       path: "/sft/work/loc/statistics",
       name: "SftWorkLocStatistics",
-      component: () => import("@/views/sft/work/loc/statistics.vue"),
+      component: () => import("@/views/sft/work/loc/statistics/index.vue"),
       meta: {
         title: "人员报警统计",
         showLink: true
