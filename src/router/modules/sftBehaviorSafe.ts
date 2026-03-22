@@ -19,6 +19,15 @@ export default {
         title: "行为安全观察与沟通管理",
         showLink: true
       }
+    },
+    {
+      path: "/sft/behavior/safe/frequency",
+      name: "SftBehaviorSafeFrequency",
+      component: () => import("@/views/sft/behavior/safe/frequency/index.vue"),
+      meta: {
+        title: "观察频次分析管理",
+        showLink: true
+      }
     }
   ]
 } satisfies RouteConfigsTable;
