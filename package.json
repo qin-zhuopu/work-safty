@@ -50,6 +50,7 @@
     "test:e2e:sft:sys:dept": "npx tsx tests/e2e/sftSysDept.spec.ts",
     "test:e2e:sft:cont:tool": "npx tsx tests/e2e/sftContTool.spec.ts",
     "test:e2e:sft:cont:manage:ledger": "npx tsx tests/e2e/sftContManageLedger.spec.ts",
+    "test:e2e:sft:work:cs": "npx tsx tests/e2e/sftWorkCs.spec.ts",
     "prepare": "husky",
     "preinstall": "npx only-allow pnpm"
   },
