@@ -46,6 +46,7 @@
     "test:e2e:sft:emerresour:ep": "npx tsx tests/e2e/sftEmerresourEp.spec.ts",
     "test:e2e:sft:work:doc:pl": "npx tsx tests/e2e/sftWorkDocPl.spec.ts",
     "test:e2e:sft:insp:site": "npx tsx tests/e2e/sftInspSite.spec.ts",
+    "test:e2e:sft:work:loc": "npx tsx tests/e2e/sftWorkLoc.spec.ts",
     "prepare": "husky",
     "preinstall": "npx only-allow pnpm"
   },
