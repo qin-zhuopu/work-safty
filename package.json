@@ -75,6 +75,7 @@
     "test:e2e:sft:train:plan:archives": "npx tsx tests/e2e/sftTrainPlanArchives.spec.ts",
     "test:e2e:sft:work:sheet:statistics": "npx tsx tests/e2e/sftWorkSheetStatistics.spec.ts",
     "test:e2e:sft:work:doc:statistics": "npx tsx tests/e2e/sftWorkDocStatistics.spec.ts",
+    "test:e2e:sft:console": "npx tsx tests/e2e/sftConsole.spec.ts",
     "prepare": "husky",
     "preinstall": "npx only-allow pnpm"
   },
