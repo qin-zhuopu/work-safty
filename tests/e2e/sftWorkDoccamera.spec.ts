@@ -90,13 +90,17 @@ async function testDoccameraPage(page: Page): Promise<void> {
 
   // 3. 验证表头
   const headers = await page.locator(".el-table__header th").allTextContents();
-  console.log("表头列:", headers.filter(h => h.trim()).slice(0, 5));
+  console.log(
+    "表头列:",
+    headers.filter(h => h.trim())
+  );
 
   // 验证关键列存在
   const headerText = headers.join(" ");
   expect(headerText).toContain("序号");
-  expect(headerText).toContain("摄像头名称");
-  expect(headerText).toContain("位置");
+  expect(headerText).toContain("ID");
+  expect(headerText).toContain("设备名称");
+  expect(headerText).toContain("序列号");
   expect(headerText).toContain("状态");
   console.log("✓ 表头列正确");
 
@@ -111,7 +115,7 @@ async function testDoccameraPage(page: Page): Promise<void> {
     .first()
     .locator("td")
     .allTextContents();
-  console.log("第一行数据:", firstRowCells.slice(0, 4).join(" | "));
+  console.log("第一行数据:", firstRowCells.join(" | "));
 
   // 6. 验证状态标签
   const statusTags = page.locator(".el-tag");

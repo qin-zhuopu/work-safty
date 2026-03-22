@@ -7,11 +7,10 @@ defineOptions({
 });
 
 interface CameraItem {
-  id: string;
+  id: number;
   name: string;
-  location: string;
-  status: string;
-  createTime: number;
+  seno: string;
+  status: number;
 }
 
 interface ApiResponse {
@@ -19,16 +18,24 @@ interface ApiResponse {
   t: {
     content: CameraItem[];
     totalElements: number;
+    totalPages: number;
+    size: number;
+    number: number;
+    first: boolean;
+    last: boolean;
+    numberOfElements: number;
+    empty: boolean;
   };
 }
 
 const tableData = ref<CameraItem[]>([]);
 const loading = ref(false);
 const total = ref(0);
+const totalPages = ref(0);
 const pageSize = 10;
-const currentPage = ref(1);
+const currentPage = ref(0);
 
-async function fetchData(page = 1) {
+async function fetchData(page = 0) {
   loading.value = true;
   currentPage.value = page;
   try {
@@ -41,6 +48,7 @@ async function fetchData(page = 1) {
     if (data.success) {
       tableData.value = data.t.content;
       total.value = data.t.totalElements;
+      totalPages.value = data.t.totalPages;
     } else {
       ElMessage.error("获取数据失败");
     }
@@ -60,12 +68,12 @@ function handlePlayback(row: CameraItem) {
   ElMessage.info(`回放摄像头: ${row.name}`);
 }
 
-function getStatusType(status: string) {
-  return status === "online" ? "success" : "danger";
+function getStatusType(status: number) {
+  return status === 1 ? "success" : "danger";
 }
 
-function getStatusText(status: string) {
-  return status === "online" ? "在线" : "离线";
+function getStatusText(status: number) {
+  return status === 1 ? "在线" : "离线";
 }
 
 onMounted(() => {
@@ -91,16 +99,17 @@ onMounted(() => {
         style="width: 100%"
       >
         <el-table-column type="index" label="序号" width="60" align="center" />
+        <el-table-column prop="id" label="ID" width="100" align="center" />
         <el-table-column
           prop="name"
-          label="摄像头名称"
-          min-width="180"
+          label="设备名称"
+          min-width="150"
           show-overflow-tooltip
         />
         <el-table-column
-          prop="location"
-          label="位置"
-          min-width="200"
+          prop="seno"
+          label="序列号"
+          min-width="280"
           show-overflow-tooltip
         />
         <el-table-column prop="status" label="状态" width="100" align="center">
@@ -108,16 +117,6 @@ onMounted(() => {
             <el-tag :type="getStatusType(row.status)">
               {{ getStatusText(row.status) }}
             </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="createTime"
-          label="创建时间"
-          width="180"
-          align="center"
-        >
-          <template #default="{ row }">
-            {{ new Date(row.createTime).toLocaleString() }}
           </template>
         </el-table-column>
         <el-table-column label="操作" width="180" align="center" fixed="right">
@@ -148,7 +147,7 @@ onMounted(() => {
           v-model:current-page="currentPage"
           :page-size="pageSize"
           :total="total"
-          layout="total, prev, pager, next, jumper"
+          layout="total, prev, pager, next"
           @current-change="fetchData"
         />
       </div>
