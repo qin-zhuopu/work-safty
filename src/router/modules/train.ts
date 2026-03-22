@@ -28,6 +28,15 @@ export default {
         title: "学习记录",
         showLink: true
       }
+    },
+    {
+      path: "/train/pc/mock/record/index",
+      name: "TrainPcMockRecord",
+      component: () => import("@/views/train/pc/mock/record/index.vue"),
+      meta: {
+        title: "模拟答题记录",
+        showLink: true
+      }
     }
   ]
 } satisfies RouteConfigsTable;
