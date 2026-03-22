@@ -6,9 +6,9 @@ export default {
   component: Layout,
   redirect: "/sft/work/loc/index",
   meta: {
-    icon: "ep:location",
+    icon: "ep:warning",
     title: "特殊工管理",
-    rank: 31
+    rank: 10
   },
   children: [
     {
@@ -17,15 +17,6 @@ export default {
       component: () => import("@/views/sft/work/loc/index.vue"),
       meta: {
         title: "特殊工管理",
-        showLink: true
-      }
-    },
-    {
-      path: "/sft/work/loc/statistics",
-      name: "SftWorkLocStatistics",
-      component: () => import("@/views/sft/work/loc/statistics/index.vue"),
-      meta: {
-        title: "人员报警统计",
         showLink: true
       }
     }
