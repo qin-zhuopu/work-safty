@@ -1,7 +1,35 @@
 import { defineFakeRoute } from "vite-plugin-fake-server/client";
 
 export default defineFakeRoute([
-  // 登录接口
+  // 登录接口 - 支持两个路径
+  {
+    url: "/login",
+    method: "post",
+    response: ({ body }) => {
+      const { uname, upass } = body as { uname?: string; upass?: string };
+
+      if (uname === "admin" && upass === "admin123") {
+        return {
+          success: true,
+          data: {
+            avatar: "https://avatars.githubusercontent.com/u/44761321",
+            username: "admin",
+            nickname: "管理员",
+            roles: ["admin"],
+            permissions: ["*:*:*"],
+            accessToken: "eyJhbGciOiJIUzUxMiJ9.admin",
+            refreshToken: "eyJhbGciOiJIUzUxMiJ9.adminRefresh",
+            expires: "2030/10/30 00:00:00"
+          }
+        };
+      } else {
+        return {
+          success: false,
+          message: "用户名或密码错误"
+        };
+      }
+    }
+  },
   {
     url: "/sft/sys/user/login",
     method: "post",
