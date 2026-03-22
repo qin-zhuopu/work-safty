@@ -86,6 +86,7 @@
     "test:e2e:sft:danger:danger": "npx tsx tests/e2e/sftDanger.spec.ts",
     "test:e2e:sft:emerresour:ma:index": "npx tsx tests/e2e/sftEmerresourMa.spec.ts",
     "test:e2e:sft:work:te": "npx tsx tests/e2e/sftWorkTe.spec.ts",
+    "test:e2e:sft:train:collect": "npx tsx tests/e2e/sftTrainCollect.spec.ts",
     "prepare": "husky",
     "preinstall": "npx only-allow pnpm"
   },
