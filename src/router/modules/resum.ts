@@ -21,6 +21,15 @@ export default {
       }
     },
     {
+      path: "/resum/plan/stat/user",
+      name: "ResumPlanStatUser",
+      component: () => import("@/views/resum/plan/stat/user.vue"),
+      meta: {
+        title: "排查人员统计",
+        showLink: true
+      }
+    },
+    {
       path: "/resum/content",
       name: "ResumContent",
       component: () => import("@/views/resum/content/index.vue"),
