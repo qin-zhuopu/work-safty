@@ -35,6 +35,7 @@
     "test:e2e:sft:am:reward": "npx tsx tests/e2e/sftAmReward.spec.ts",
     "test:e2e:sft:am:as": "npx tsx tests/e2e/sftAmAs.spec.ts",
     "test:e2e:sft:train:pc:plan": "npx tsx tests/e2e/sftTrainPcPlan.spec.ts",
+    "test:e2e:sft:train:pc:record": "npx tsx tests/e2e/sftTrainPcRecord.spec.ts",
     "test:e2e:sft:cont:per:hmd": "npx tsx tests/e2e/sftContPerHmd.spec.ts",
     "test:e2e:sft:cont:manage:hmd": "npx tsx tests/e2e/sftContManageHmd.spec.ts",
     "test:e2e:sft:data:gds:index": "npx tsx tests/e2e/sftDataGds.spec.ts",
