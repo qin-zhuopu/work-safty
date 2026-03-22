@@ -19,6 +19,9 @@
     "lint:stylelint": "stylelint --cache --fix \"**/*.{html,vue,css,scss}\" --cache-location node_modules/.cache/stylelint/",
     "lint": "pnpm lint:eslint && pnpm lint:prettier && pnpm lint:stylelint",
     "test:e2e": "npx tsx tests/e2e/stat.spec.ts",
+    "test:e2e:resum:plan:stat": "npx tsx tests/e2e/stat.spec.ts",
+    "test:e2e:train:plantype:index": "npx tsx tests/e2e/trainPlantype.spec.ts",
+    "test:e2e:work:doccamera:index": "npx tsx tests/e2e/doccamera.spec.ts",
     "prepare": "husky",
     "preinstall": "npx only-allow pnpm"
   },
