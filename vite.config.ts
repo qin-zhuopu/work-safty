@@ -27,7 +27,7 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
       proxy: {},
       // 忽略文件监听
       watch: {
-        ignored: ["**/.claude-trace/**"]
+        ignored: ["**/.claude-trace/**", "**/files/**"]
       },
       // 预热文件以提前转换和缓存结果，降低启动期间的初始页面加载时长并防止转换瀑布
       warmup: {

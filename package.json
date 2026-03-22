@@ -18,6 +18,7 @@
     "lint:prettier": "prettier --write  \"src/**/*.{js,ts,json,tsx,css,scss,vue,html,md}\"",
     "lint:stylelint": "stylelint --cache --fix \"**/*.{html,vue,css,scss}\" --cache-location node_modules/.cache/stylelint/",
     "lint": "pnpm lint:eslint && pnpm lint:prettier && pnpm lint:stylelint",
+    "test:e2e": "npx tsx tests/e2e/stat.spec.ts",
     "prepare": "husky",
     "preinstall": "npx only-allow pnpm"
   },
@@ -81,6 +82,8 @@
     "@faker-js/faker": "^10.1.0",
     "@iconify/json": "^2.2.400",
     "@iconify/vue": "4.2.0",
+    "@playwright/browser-chromium": "^1.58.2",
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/vite": "^4.1.16",
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^20.19.23",
