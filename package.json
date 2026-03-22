@@ -63,6 +63,8 @@
     "test:e2e:sft:change:index": "npx tsx tests/e2e/sftChange.spec.ts",
     "test:e2e:sft:work:doc:fail": "npx tsx tests/e2e/sftWorkDocFail.spec.ts",
     "test:e2e:sft:work:act": "npx tsx tests/e2e/sftWorkAct.spec.ts",
+    "test:e2e:sft:am:am": "npx tsx tests/e2e/sftAmAm.spec.ts",
+    "test:e2e:sft:danger:check": "npx tsx tests/e2e/sftDangerCheck.spec.ts",
     "prepare": "husky",
     "preinstall": "npx only-allow pnpm"
   },
