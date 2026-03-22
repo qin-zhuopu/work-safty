@@ -28,6 +28,7 @@
     "test:e2e:work:period:index": "npx tsx tests/e2e/workPeriod.spec.ts",
     "test:e2e:train:pc:record:learn": "npx tsx tests/e2e/train/pc/record/learn.spec.ts",
     "test:e2e:train:pc:mock:record:index": "npx tsx tests/e2e/train/pc/mock/record.spec.ts",
+    "test:e2e:emergency:drill": "npx tsx tests/e2e/emergencyDrill.spec.ts",
     "prepare": "husky",
     "preinstall": "npx only-allow pnpm"
   },
