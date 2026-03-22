@@ -19,6 +19,15 @@ export default {
         title: "特殊工管理",
         showLink: true
       }
+    },
+    {
+      path: "/sft/work/loc/statistics",
+      name: "SftWorkLocStatistics",
+      component: () => import("@/views/sft/work/loc/statistics.vue"),
+      meta: {
+        title: "人员报警统计",
+        showLink: true
+      }
     }
   ]
 } satisfies RouteConfigsTable;
