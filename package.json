@@ -30,6 +30,7 @@
     "test:e2e:train:pc:mock:record:index": "npx tsx tests/e2e/train/pc/mock/record.spec.ts",
     "test:e2e:train:pc:mock:index": "npx tsx tests/e2e/train-pc-mock.spec.ts",
     "test:e2e:emergency:drill": "npx tsx tests/e2e/emergencyDrill.spec.ts",
+    "test:e2e:train:edu:index": "npx tsx tests/e2e/trainEdu.spec.ts",
     "prepare": "husky",
     "preinstall": "npx only-allow pnpm"
   },

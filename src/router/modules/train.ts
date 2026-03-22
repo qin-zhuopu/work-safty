@@ -46,6 +46,15 @@ export default {
         title: "模拟答题",
         showLink: true
       }
+    },
+    {
+      path: "/train/edu/index",
+      name: "TrainEdu",
+      component: () => import("@/views/train/edu/index.vue"),
+      meta: {
+        title: "教育培训管理",
+        showLink: true
+      }
     }
   ]
 } satisfies RouteConfigsTable;
