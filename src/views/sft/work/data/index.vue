@@ -8,8 +8,8 @@ defineOptions({
 
 interface WorkDataItem {
   id: string;
-  field16: string;
-  field17: string;
+  field14: string;
+  field15: string;
   type: number;
 }
 
@@ -28,7 +28,7 @@ const pageSize = 10;
 const currentPage = ref(1);
 
 const searchForm = reactive({
-  field12: ""
+  field14: ""
 });
 
 const selectedIds = ref<string[]>([]);
@@ -40,9 +40,9 @@ async function fetchData(page = 1) {
     const params = new URLSearchParams({
       page: String(page),
       size: String(pageSize),
-      ...(searchForm.field12 && { field17: searchForm.field12 })
+      ...(searchForm.field14 && { field14: searchForm.field14 })
     });
-    const response = await fetch(`/sft/work/data/list/2.json?${params}`);
+    const response = await fetch(`/sft/work/data/list/3.json?${params}`);
     const data: ApiResponse = await response.json();
     if (data.success) {
       tableData.value = data.t.content;
@@ -63,7 +63,7 @@ function handleSearch() {
 }
 
 function handleReset() {
-  searchForm.field12 = "";
+  searchForm.field14 = "";
   fetchData(1);
 }
 
@@ -72,7 +72,7 @@ function handleAdd() {
 }
 
 function handleDownloadTemplate() {
-  window.open("/pub/xls/应急处置措施数据库（注意格式为2003）.xls");
+  window.open("/pub/xls/施工工器具数据库（注意格式为2003）.xls");
 }
 
 function handleImport() {
@@ -136,16 +136,16 @@ onMounted(() => {
     <el-card shadow="never">
       <template #header>
         <div class="card-header">
-          <span class="text-lg font-medium">应急处置措施数据库</span>
+          <span class="text-lg font-medium">施工工器具数据库</span>
         </div>
       </template>
 
       <!-- 搜索表单 -->
       <el-form :inline="true" :model="searchForm" class="search-form">
-        <el-form-item label="应急处置措施内容">
+        <el-form-item label="机具名称">
           <el-input
-            v-model="searchForm.field12"
-            placeholder="请输入应急处置措施内容"
+            v-model="searchForm.field14"
+            placeholder="请输入机具名称"
             clearable
             style="width: 260px"
           />
@@ -181,15 +181,15 @@ onMounted(() => {
         <el-table-column type="selection" width="55" align="center" />
         <el-table-column type="index" label="序号" width="60" align="center" />
         <el-table-column
-          prop="field16"
-          label="主要后果"
-          min-width="120"
+          prop="field14"
+          label="机具名称"
+          min-width="200"
           show-overflow-tooltip
         />
         <el-table-column
-          prop="field17"
-          label="应急处置措施内容"
-          min-width="400"
+          prop="field15"
+          label="型号"
+          min-width="200"
           show-overflow-tooltip
         />
         <el-table-column label="操作" width="150" align="center" fixed="right">

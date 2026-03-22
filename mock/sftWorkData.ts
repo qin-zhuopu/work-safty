@@ -1,7 +1,116 @@
 import { defineFakeRoute } from "vite-plugin-fake-server/client";
 
-// 模拟数据 - 应急处置措施数据库
-const mockData = [
+// 模拟数据 - 施工工器具数据库 (type=3)
+const constructionToolData = [
+  {
+    id: "1",
+    type: 3,
+    field14: "塔式起重机",
+    field15: "QTZ80(TC5610)",
+    addDate: 1709171832000
+  },
+  {
+    id: "2",
+    type: 3,
+    field14: "施工升降机",
+    field15: "SC200/200",
+    addDate: 1709021604000
+  },
+  {
+    id: "3",
+    type: 3,
+    field14: "钢筋切断机",
+    field15: "GQ40",
+    addDate: 1708399736000
+  },
+  {
+    id: "4",
+    type: 3,
+    field14: "钢筋弯曲机",
+    field15: "GW40",
+    addDate: 1708399736000
+  },
+  {
+    id: "5",
+    type: 3,
+    field14: "混凝土搅拌机",
+    field15: "JS500",
+    addDate: 1708399736000
+  },
+  {
+    id: "6",
+    type: 3,
+    field14: "插入式振动器",
+    field15: "ZX-50",
+    addDate: 1708399736000
+  },
+  {
+    id: "7",
+    type: 3,
+    field14: "交流电焊机",
+    field15: "BX3-300",
+    addDate: 1708399736000
+  },
+  {
+    id: "8",
+    type: 3,
+    field14: "木工圆锯机",
+    field15: "MJ104",
+    addDate: 1708399736000
+  },
+  {
+    id: "9",
+    type: 3,
+    field14: "潜水泵",
+    field15: "QY-65",
+    addDate: 1708399736000
+  },
+  {
+    id: "10",
+    type: 3,
+    field14: "手持电动工具",
+    field15: "ZIC-01",
+    addDate: 1708399736000
+  },
+  {
+    id: "11",
+    type: 3,
+    field14: "空气压缩机",
+    field15: "W-0.9/7",
+    addDate: 1708399736000
+  },
+  {
+    id: "12",
+    type: 3,
+    field14: "砂轮切割机",
+    field15: "Y3L-400",
+    addDate: 1708399736000
+  },
+  {
+    id: "13",
+    type: 3,
+    field14: "电动葫芦",
+    field15: "CD-3T",
+    addDate: 1708399736000
+  },
+  {
+    id: "14",
+    type: 3,
+    field14: "卷扬机",
+    field15: "JK-5T",
+    addDate: 1708399736000
+  },
+  {
+    id: "15",
+    type: 3,
+    field14: "叉车",
+    field15: "CPC30",
+    addDate: 1708399736000
+  }
+];
+
+// 模拟数据 - 应急处置措施数据库 (type=2)
+const emergencyResponseData = [
   {
     id: "133",
     type: 2,
@@ -109,6 +218,61 @@ const mockData = [
 ];
 
 export default defineFakeRoute([
+  // 施工工器具数据库 API (type=3)
+  {
+    url: "/sft/work/data/list/3.json",
+    method: "get",
+    response: ({ query }) => {
+      const page = parseInt(query.page as string) || 1;
+      const size = parseInt(query.size as string) || 10;
+      const field14 = (query.field14 as string) || "";
+
+      // 过滤数据
+      let filteredData = constructionToolData;
+      if (field14) {
+        filteredData = constructionToolData.filter(
+          item => item.field14 && item.field14.includes(field14)
+        );
+      }
+
+      // 分页
+      const start = (page - 1) * size;
+      const end = start + size;
+      const pageData = filteredData.slice(start, end);
+
+      return {
+        success: true,
+        t: {
+          content: pageData,
+          totalElements: filteredData.length,
+          pageable: {
+            offset: 0,
+            pageNumber: page - 1,
+            pageSize: size,
+            paged: true,
+            sort: {
+              empty: false,
+              sorted: true,
+              unsorted: false
+            },
+            unpaged: false
+          },
+          first: page === 1,
+          last: end >= filteredData.length,
+          number: page - 1,
+          numberOfElements: pageData.length,
+          size,
+          sort: {
+            empty: false,
+            sorted: true,
+            unsorted: false
+          },
+          empty: pageData.length === 0
+        }
+      };
+    }
+  },
+  // 应急处置措施数据库 API (type=2)
   {
     url: "/sft/work/data/list/2.json",
     method: "get",
@@ -118,9 +282,9 @@ export default defineFakeRoute([
       const field17 = (query.field17 as string) || "";
 
       // 过滤数据
-      let filteredData = mockData;
+      let filteredData = emergencyResponseData;
       if (field17) {
-        filteredData = mockData.filter(
+        filteredData = emergencyResponseData.filter(
           item => item.field17 && item.field17.includes(field17)
         );
       }

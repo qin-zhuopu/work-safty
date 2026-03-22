@@ -7,7 +7,7 @@ export default {
   redirect: "/sft/work/data/index",
   meta: {
     icon: "ep:document",
-    title: "应急处置措施数据库",
+    title: "施工工器具数据库",
     rank: 30
   },
   children: [
@@ -16,7 +16,7 @@ export default {
       name: "SftWorkDataIndex",
       component: () => import("@/views/sft/work/data/index.vue"),
       meta: {
-        title: "应急处置措施数据库",
+        title: "施工工器具数据库",
         showLink: true
       }
     }

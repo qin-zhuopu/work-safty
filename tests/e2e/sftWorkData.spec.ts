@@ -1,5 +1,5 @@
 /**
- * 应急处置措施数据库页面 - 端到端测试
+ * 施工工器具数据库页面 - 端到端测试
  * 使用 Playwright CDP 连接已有的 Chrome 实例
  */
 
@@ -71,10 +71,10 @@ async function login(page: Page): Promise<void> {
 }
 
 /**
- * 测试应急处置措施数据库页面
+ * 测试施工工器具数据库页面
  */
 async function testWorkDataPage(page: Page): Promise<void> {
-  console.log("\n=== 测试应急处置措施数据库页面 ===");
+  console.log("\n=== 测试施工工器具数据库页面 ===");
 
   // 导航到目标页面
   await page.goto(`${BASE_URL}/sft/work/data/index`);
@@ -82,11 +82,11 @@ async function testWorkDataPage(page: Page): Promise<void> {
 
   // 1. 验证页面标题
   const title = await page.textContent(".card-header span, h1, h2");
-  expect(title).toContain("应急处置措施数据库");
+  expect(title).toContain("施工工器具数据库");
   console.log("✓ 页面标题正确");
 
   // 2. 验证搜索表单存在
-  const searchInput = page.locator('input[placeholder*="应急处置措施内容"]');
+  const searchInput = page.locator('input[placeholder*="机具名称"]');
   await expect(searchInput.first()).toBeVisible();
   console.log("✓ 搜索输入框已渲染");
 
@@ -114,8 +114,8 @@ async function testWorkDataPage(page: Page): Promise<void> {
   // 验证关键列存在
   const headerText = headers.join(" ");
   expect(headerText).toContain("序号");
-  expect(headerText).toContain("主要后果");
-  expect(headerText).toContain("应急处置措施内容");
+  expect(headerText).toContain("机具名称");
+  expect(headerText).toContain("型号");
   console.log("✓ 表头列正确");
 
   // 6. 验证数据行
