@@ -61,6 +61,7 @@
     "test:e2e:sft:work:doc:index": "npx tsx tests/e2e/sftWorkDocIndex.spec.ts",
     "test:e2e:sft:emerresour:material": "npx tsx tests/e2e/sftEmerresourMaterial.spec.ts",
     "test:e2e:sft:change:index": "npx tsx tests/e2e/sftChange.spec.ts",
+    "test:e2e:sft:work:doc:fail": "npx tsx tests/e2e/sftWorkDocFail.spec.ts",
     "prepare": "husky",
     "preinstall": "npx only-allow pnpm"
   },
