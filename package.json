@@ -33,6 +33,8 @@
     "test:e2e:train:edu:index": "npx tsx tests/e2e/trainEdu.spec.ts",
     "test:e2e:sft:risk:special": "npx tsx tests/e2e/sftRiskSpecial.spec.ts",
     "test:e2e:sft:am:reward": "npx tsx tests/e2e/sftAmReward.spec.ts",
+    "test:e2e:sft:train:pc:plan": "npx tsx tests/e2e/sftTrainPcPlan.spec.ts",
+    "test:e2e:sft:cont:per:hmd": "npx tsx tests/e2e/sftContPerHmd.spec.ts",
     "prepare": "husky",
     "preinstall": "npx only-allow pnpm"
   },
