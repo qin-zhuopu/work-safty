@@ -2,323 +2,249 @@ import { defineFakeRoute } from "vite-plugin-fake-server/client";
 
 export default defineFakeRoute([
   {
-    url: "/sft/danger/danger/list.json",
+    url: "/sft/danger/danger/list",
     method: "get",
-    response: ({
-      query
-    }: {
-      query: {
-        page?: string;
-        size?: string;
-        name?: string;
-        status?: string;
-        dangerType?: string;
-        classify1?: string;
-        level?: string;
-        checkType?: string;
-      };
-    }) => {
+    response: ({ query }) => {
       const page = Number(query.page) || 1;
       const size = Number(query.size) || 10;
 
-      const allData = [
+      // Mock 数据
+      const mockData = [
         {
-          id: 146266,
-          name: "办公室职工食堂一楼操作间大灶点化器老化，易泄露回火，引起火灾",
-          status: "审批中",
-          addDate: 1774168251587,
+          id: 1,
+          name: "液氯贮槽罐区未设置明显的安全警示标志",
+          type: 2,
+          status: "完成",
+          termStatus: 12,
+          immeStatus: 5,
+          pics: "/upload/danger/1.jpg",
+          rectPics: "/upload/danger/rect_1.jpg",
+          gdUser: { id: 10, ushow: "张三", sysDept: { name: "安全部" } },
+          gdDate: 1711000000000,
+          jcbmUser: { id: 11, ushow: "李四", sysDept: { name: "生产部" } },
+          jcbmDate: 1711003600000,
+          level: "一级",
+          zxjcmc: "专项检查",
           dangerType: "安全",
           classify1: "物的不安全状态",
-          level: "四级",
+          classify2: "防护设施缺失",
           checkType: "日常排查",
-          typed: 2,
-          addDept: { id: 4, name: "办公室（党委办公室）" },
-          addUser: { id: 166, ushow: "蒋树怀" }
+          securityCosts: 1,
+          causeAnalysis: "日常管理疏忽",
+          recomRequ: "立即整改",
+          rectifyDate: 1711200000000,
+          zrbmUser: { id: 12, ushow: "王五", sysDept: { name: "设备部" } },
+          zrbmDate: 1711007200000,
+          rectUser: { id: 13, ushow: "赵六", sysDept: { name: "维修班" } },
+          rectDate: 1711100800000,
+          rectMeasures: "已增设警示标志",
+          cjUser: { id: 14, ushow: "孙七", sysDept: { name: "安全部" } },
+          cjDate: 1711154400000,
+          verification: "整改完成，验收合格",
+          lhpcr: "张三、李四",
+          addUser: { id: 15, ushow: "周八", sysDept: { name: "生产部" } },
+          addDate: 1710900000000
         },
         {
-          id: 146265,
-          name: "热电车间环保工段六号炉四组皮带托辊螺丝掉落，造成安全隐患。安全红丝带隐患已排除",
-          status: "提交",
-          addDate: 1774167779897,
-          dangerType: "",
-          classify1: "",
-          level: "",
-          checkType: "日常排查",
-          addDept: { id: 22, name: "热电车间" },
-          addUser: { id: 140, ushow: "李文锴" }
-        },
-        {
-          id: 146264,
-          name: "聚氯乙烯车间聚合三线操作室应急柜摆放碘伏",
-          status: "提交",
-          addDate: 1774167316957,
-          dangerType: "",
-          classify1: "",
-          level: "",
-          checkType: "专业性排查",
-          addDept: { id: 9, name: "HSE管理部" },
-          addUser: { id: 159, ushow: "马绪勇" }
-        },
-        {
-          id: 146263,
-          name: "供水工段化工区黄河水操作室南侧药剂存放室应急灯不亮",
-          status: "提交",
-          addDate: 1774167015857,
-          dangerType: "",
-          classify1: "",
-          level: "",
-          checkType: "专业性排查",
-          addDept: { id: 9, name: "HSE管理部" },
-          addUser: { id: 159, ushow: "马绪勇" }
-        },
-        {
-          id: 146262,
-          name: "供水工段化工区黄河水操作室北侧室外消火栓蜘蛛网较多，卫生差",
-          status: "提交",
-          addDate: 1774166743317,
-          dangerType: "",
-          classify1: "",
-          level: "",
-          checkType: "专业性排查",
-          addDept: { id: 9, name: "HSE管理部" },
-          addUser: { id: 159, ushow: "马绪勇" }
-        },
-        {
-          id: 146261,
-          name: "双氧水车间双氧水装置工段现场西侧应急柜内消防水带接口卡扣锈蚀",
+          id: 2,
+          name: "氯乙烯聚合车间压力表超期未检定",
+          type: 1,
           status: "整改中",
-          addDate: 1774086967327,
+          termStatus: 8,
+          immeStatus: 3,
+          level: "二级",
+          dangerType: "仪表",
+          classify1: "管理的缺陷",
+          checkType: "专业性排查",
+          rectifyDate: 1711500000000,
+          gdUser: { id: 16, ushow: "吴九", sysDept: { name: "仪表车间" } },
+          gdDate: 1711000000000,
+          addUser: { id: 17, ushow: "郑十", sysDept: { name: "质检部" } },
+          addDate: 1710950000000,
+          zrbmUser: { id: 18, ushow: "冯十一", sysDept: { name: "仪表车间" } },
+          zrbmDate: 1711010000000,
+          rectUser: { id: 19, ushow: "陈十二", sysDept: { name: "维修班" } },
+          rectDate: 1711100000000
+        },
+        {
+          id: 3,
+          name: "聚氯乙烯气柜区消防器材配备不足",
+          type: 2,
+          status: "提交",
+          termStatus: 1,
+          immeStatus: 1,
+          level: "一级",
           dangerType: "消防",
           classify1: "物的不安全状态",
-          level: "四级",
-          checkType: "日常排查",
-          typed: 1,
-          addDept: { id: 23, name: "双氧水车间" },
-          addUser: { id: 140, ushow: "李文锴" }
-        },
-        {
-          id: 146260,
-          name: "电解车间液氯工段液氯充装平台北侧一报警器无防雨罩",
-          status: "完成",
-          addDate: 1774084747007,
-          dangerType: "电气",
-          classify1: "物的不安全状态",
-          level: "三级",
-          checkType: "季节性排查",
-          typed: 2,
-          addDept: { id: 20, name: "电解车间" },
-          addUser: { id: 166, ushow: "蒋树怀" }
-        },
-        {
-          id: 146259,
-          name: "聚氯乙烯车间压滤工段压滤厂房二楼配电柜前绝缘胶垫破损老化",
-          status: "超期",
-          addDate: 1774080907567,
-          dangerType: "电气",
-          classify1: "物的不安全状态",
-          level: "二级",
-          checkType: "专业性排查",
-          typed: 2,
-          addDept: { id: 19, name: "聚氯乙烯车间" },
-          addUser: { id: 159, ushow: "马绪勇" }
-        },
-        {
-          id: 146258,
-          name: "机电仪车间仪表工段DCS机柜间应急照明灯具损坏",
-          status: "驳回",
-          addDate: 1774079795477,
-          dangerType: "安全",
-          classify1: "管理的缺陷",
-          level: "四级",
-          checkType: "车间每周综合检查",
-          typed: 1,
-          addDept: { id: 21, name: "机电仪车间" },
-          addUser: { id: 140, ushow: "李文锴" }
-        },
-        {
-          id: 146257,
-          name: "热电车间锅炉工段四号炉给粉机平台防护栏杆松动",
-          status: "审批中",
-          addDate: 1774078805087,
-          dangerType: "设备",
-          classify1: "物的不安全状态",
-          level: "三级",
-          checkType: "重点时段及节假日前排查",
-          typed: 2,
-          addDept: { id: 22, name: "热电车间" },
-          addUser: { id: 159, ushow: "马绪勇" }
-        },
-        {
-          id: 146256,
-          name: "HSE管理部安全管理办公室消防器材检查记录不规范",
-          status: "提交",
-          addDate: 1774077195737,
-          dangerType: "安全",
-          classify1: "管理的缺陷",
-          level: "四级",
           checkType: "综合性排查",
-          addDept: { id: 9, name: "HSE管理部" },
-          addUser: { id: 166, ushow: "蒋树怀" }
+          rectifyDate: 1711800000000,
+          addUser: { id: 20, ushow: "褚十三", sysDept: { name: "消防队" } },
+          addDate: 1711000000000
         },
         {
-          id: 146255,
-          name: "运营管理部生产运营办调度室应急药品过期",
-          status: "整改中",
-          addDate: 1774076403577,
-          dangerType: "职业健康",
-          classify1: "环境的不安全因素",
-          level: "四级",
-          checkType: "日常排查",
-          typed: 1,
-          addDept: { id: 11, name: "运营管理部" },
-          addUser: { id: 140, ushow: "李文锴" }
-        },
-        {
-          id: 146254,
-          name: "办公室行政（党委）办公室档案室灭火器压力不足",
-          status: "完成",
-          addDate: 1774075684067,
-          dangerType: "消防",
-          classify1: "物的不安全状态",
-          level: "四级",
-          checkType: "巡检隐患",
-          typed: 1,
-          addDept: { id: 4, name: "办公室（党委办公室）" },
-          addUser: { id: 159, ushow: "马绪勇" }
-        },
-        {
-          id: 146253,
-          name: "质检中心中心化验室废液存放间通风不良",
-          status: "提交",
-          addDate: 1774074922337,
-          dangerType: "环保",
-          classify1: "环境的不安全因素",
-          level: "三级",
-          checkType: "专业性排查",
-          addDept: { id: 2492, name: "研发中心" },
-          addUser: { id: 166, ushow: "蒋树怀" }
-        },
-        {
-          id: 146252,
-          name: "供应链管理部市场营销办公室仓库货物堆放过高",
+          id: 4,
+          name: "氯乙烯贮槽罐区操作规程未及时更新",
+          type: 2,
           status: "审批中",
-          addDate: 1774073845137,
-          dangerType: "安全",
-          classify1: "人的不安全行为",
-          level: "四级",
-          checkType: "事故类比排查",
-          typed: 2,
-          addDept: { id: 13, name: "供应链管理部" },
-          addUser: { id: 140, ushow: "李文锴" }
-        },
-        {
-          id: 146251,
-          name: "财务管理部财务管理办公室财务档案室消防通道堵塞",
-          status: "超期",
-          addDate: 1774072507777,
-          dangerType: "消防",
-          classify1: "管理的缺陷",
-          level: "二级",
-          checkType: "监管部门监督检查",
-          typed: 2,
-          addDept: { id: 14, name: "财务管理部" },
-          addUser: { id: 159, ushow: "马绪勇" }
-        },
-        {
-          id: 146250,
-          name: "人力资源部培训档案不完善，缺少部分培训记录",
-          status: "整改中",
-          addDate: 1774071795817,
-          dangerType: "安全",
-          classify1: "管理的缺陷",
-          level: "四级",
-          checkType: "外聘专家诊断式排查",
-          typed: 2,
-          addDept: { id: 8, name: "人力资源部" },
-          addUser: { id: 166, ushow: "蒋树怀" }
-        },
-        {
-          id: 146249,
-          name: "电解车间氯氢处理及氯化氢工段现场安全警示标识模糊不清",
-          status: "完成",
-          addDate: 1774071083857,
-          dangerType: "安全",
-          classify1: "物的不安全状态",
+          termStatus: 3,
+          immeStatus: 3,
           level: "三级",
-          checkType: "重大危险源排查",
-          typed: 1,
-          addDept: { id: 20, name: "电解车间" },
-          addUser: { id: 140, ushow: "李文锴" }
+          dangerType: "工艺",
+          classify1: "管理的缺陷",
+          checkType: "季节性排查",
+          rectifyDate: 1712000000000,
+          gdUser: { id: 21, ushow: "卫十四", sysDept: { name: "技术部" } },
+          gdDate: 1711020000000,
+          addUser: { id: 22, ushow: "蒋十五", sysDept: { name: "生产部" } },
+          addDate: 1710980000000,
+          zrbmUser: { id: 23, ushow: "沈十六", sysDept: { name: "技术部" } },
+          zrbmDate: 1711030000000
         },
         {
-          id: 146248,
-          name: "聚氯乙烯车间乙炔工段发生器平台护栏高度不符合标准",
-          status: "提交",
-          addDate: 1774070218097,
+          id: 5,
+          name: "电石料仓防雨棚局部破损",
+          type: 1,
+          status: "完成",
+          termStatus: 12,
+          immeStatus: 5,
+          level: "四级",
           dangerType: "设备",
           classify1: "物的不安全状态",
-          level: "二级",
-          checkType: "复产复工前排查",
-          addDept: { id: 19, name: "聚氯乙烯车间" },
-          addUser: { id: 159, ushow: "马绪勇" }
+          checkType: "日常排查",
+          rectifyDate: 1711100000000,
+          gdUser: { id: 24, ushow: "韩十七", sysDept: { name: "仓储部" } },
+          gdDate: 1710990000000,
+          addUser: { id: 25, ushow: "杨十八", sysDept: { name: "仓储部" } },
+          addDate: 1710890000000,
+          rectUser: { id: 26, ushow: "朱十九", sysDept: { name: "维修班" } },
+          rectDate: 1711050000000,
+          cjUser: { id: 27, ushow: "秦二十", sysDept: { name: "仓储部" } },
+          cjDate: 1711080000000
         },
         {
-          id: 146247,
-          name: "热电车间汽机工段润滑油站消防沙箱沙量不足",
-          status: "审批中",
-          addDate: 1774069352337,
-          dangerType: "消防",
+          id: 6,
+          name: "产品罐区管道腐蚀严重",
+          type: 2,
+          status: "超期",
+          termStatus: 8,
+          immeStatus: 3,
+          level: "二级",
+          dangerType: "设备",
           classify1: "物的不安全状态",
+          checkType: "车间每周综合检查",
+          rectifyDate: 1711400000000,
+          addUser: { id: 28, ushow: "尤二十一", sysDept: { name: "设备部" } },
+          addDate: 1710800000000,
+          zrbmUser: { id: 29, ushow: "许二十二", sysDept: { name: "设备部" } },
+          zrbmDate: 1710810000000,
+          rectUser: { id: 30, ushow: "何二十三", sysDept: { name: "维修班" } },
+          rectDate: 1710900000000
+        },
+        {
+          id: 7,
+          name: "EDC罐区可燃气体检测报警器故障",
+          type: 1,
+          status: "完成",
+          termStatus: 12,
+          immeStatus: 5,
+          level: "一级",
+          dangerType: "仪表",
+          classify1: "物的不安全状态",
+          checkType: "日常排查",
+          rectifyDate: 1711150000000,
+          gdUser: { id: 31, ushow: "吕二十四", sysDept: { name: "仪表车间" } },
+          gdDate: 1711005000000,
+          addUser: { id: 32, ushow: "施二十五", sysDept: { name: "生产部" } },
+          addDate: 1710920000000,
+          rectUser: { id: 33, ushow: "张二十六", sysDept: { name: "维修班" } },
+          rectDate: 1711060000000,
+          cjUser: { id: 34, ushow: "孔二十七", sysDept: { name: "安全部" } },
+          cjDate: 1711090000000
+        },
+        {
+          id: 8,
+          name: "VCM装置安全阀效验记录缺失",
+          type: 2,
+          status: "驳回",
+          termStatus: 2,
+          immeStatus: 2,
           level: "三级",
+          dangerType: "安全",
+          classify1: "管理的缺陷",
+          checkType: "监管部门监督检查",
+          rectifyDate: 1711900000000,
+          addUser: { id: 35, ushow: "曹二十八", sysDept: { name: "安全部" } },
+          addDate: 1710970000000
+        },
+        {
+          id: 9,
+          name: "聚氯乙烯装置应急演练记录不完整",
+          type: 2,
+          status: "整改中",
+          termStatus: 8,
+          immeStatus: 3,
+          level: "三级",
+          dangerType: "安全",
+          classify1: "管理的缺陷",
+          checkType: "重点时段及节假日前排查",
+          rectifyDate: 1711700000000,
+          gdUser: { id: 36, ushow: "严二十九", sysDept: { name: "安全部" } },
+          gdDate: 1711015000000,
+          addUser: { id: 37, ushow: "华三十", sysDept: { name: "生产部" } },
+          addDate: 1710930000000,
+          zrbmUser: { id: 38, ushow: "金三十一", sysDept: { name: "安全部" } },
+          zrbmDate: 1711025000000,
+          rectUser: { id: 39, ushow: "魏三十二", sysDept: { name: "安全部" } },
+          rectDate: 1711070000000
+        },
+        {
+          id: 10,
+          name: "氯乙烯成品罐区防雷接地检测过期",
+          type: 2,
+          status: "完成",
+          termStatus: 12,
+          immeStatus: 5,
+          level: "一级",
+          dangerType: "电气",
+          classify1: "管理的缺陷",
           checkType: "季节性排查",
-          typed: 2,
-          addDept: { id: 22, name: "热电车间" },
-          addUser: { id: 166, ushow: "蒋树怀" }
+          rectifyDate: 1711250000000,
+          gdUser: { id: 40, ushow: "陶三十三", sysDept: { name: "电气车间" } },
+          gdDate: 1711008000000,
+          addUser: { id: 41, ushow: "姜三十四", sysDept: { name: "设备部" } },
+          addDate: 1710910000000,
+          zrbmUser: {
+            id: 42,
+            ushow: "戚三十五",
+            sysDept: { name: "电气车间" }
+          },
+          zrbmDate: 1711018000000,
+          rectUser: { id: 43, ushow: "谢三十六", sysDept: { name: "维修班" } },
+          rectDate: 1711075000000,
+          cjUser: { id: 44, ushow: "邹三十七", sysDept: { name: "安全部" } },
+          cjDate: 1711120000000
         }
       ];
-
-      // 筛选逻辑
-      let filteredData = allData;
-      if (query.name) {
-        filteredData = filteredData.filter(item =>
-          item.name.includes(query.name)
-        );
-      }
-      if (query.status) {
-        filteredData = filteredData.filter(
-          item => item.status === query.status
-        );
-      }
-      if (query.dangerType) {
-        filteredData = filteredData.filter(
-          item => item.dangerType === query.dangerType
-        );
-      }
-      if (query.classify1) {
-        filteredData = filteredData.filter(
-          item => item.classify1 === query.classify1
-        );
-      }
-      if (query.level) {
-        filteredData = filteredData.filter(item => item.level === query.level);
-      }
-      if (query.checkType) {
-        filteredData = filteredData.filter(
-          item => item.checkType === query.checkType
-        );
-      }
-
-      const totalElements = filteredData.length;
-      const start = (page - 1) * size;
-      const end = start + size;
-      const content = filteredData.slice(start, end);
 
       return {
         success: true,
         t: {
-          content,
-          totalElements
+          content: mockData,
+          totalElements: 10,
+          totalPages: 1,
+          size: size,
+          number: page - 1
         }
+      };
+    }
+  },
+  {
+    url: "/sft/danger/danger/del/:id",
+    method: "get",
+    response: () => {
+      return {
+        success: true,
+        message: "删除成功"
       };
     }
   }

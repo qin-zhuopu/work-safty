@@ -1,59 +1,97 @@
 <script setup lang="ts">
-import { ref, onMounted, reactive } from "vue";
+import { ref, onMounted } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import type { FormInstance } from "element-plus";
 
 defineOptions({
-  name: "SftDanger"
+  name: "SftDangerDanger"
 });
 
 interface User {
   id: number;
   ushow: string;
-}
-
-interface Dept {
-  id: number;
-  name: string;
+  sysDept?: {
+    name: string;
+  };
 }
 
 interface DangerItem {
   id: number;
   name: string;
+  type: number;
   status: string;
-  addDate: number;
+  termStatus?: number;
+  immeStatus?: number;
+  pics?: string;
+  rectPics?: string;
+  gdUser?: User;
+  gdDate?: number;
+  jcbmUser?: User;
+  jcbmDate?: number;
+  level: string;
+  zxjcmc?: string;
   dangerType?: string;
   classify1?: string;
-  level?: string;
+  classify2?: string;
   checkType?: string;
-  typed?: number;
-  addDept: Dept | null;
-  addUser: User | null;
-  resDept?: Dept | null;
-  checkUser?: User | null;
+  securityCosts?: number;
+  causeAnalysis?: string;
+  recomRequ?: string;
+  rectifyDate?: number;
+  zrbmUser?: User;
+  zrbmDate?: number;
+  rectUser?: User;
+  rectDate?: number;
+  rectMeasures?: string;
+  cjUser?: User;
+  cjDate?: number;
+  verification?: string;
+  lhpcr?: string;
+  addUser?: User;
+  addDate?: number;
+}
+
+interface PageData {
+  content: DangerItem[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
 }
 
 interface ApiResponse {
   success: boolean;
-  t: {
-    content: DangerItem[];
-    totalElements: number;
-  };
+  t: PageData;
+  message?: string;
 }
 
+interface DeptItem {
+  id: number;
+  name: string;
+  value: number;
+  children?: DeptItem[];
+}
+
+interface DeptResponse {
+  success: boolean;
+  t: DeptItem[];
+}
+
+const formRef = ref<FormInstance>();
 const tableData = ref<DangerItem[]>([]);
 const loading = ref(false);
+const deptOptions = ref<DeptItem[]>([]);
 const total = ref(0);
 const currentPage = ref(1);
 const pageSize = ref(10);
 
-const searchForm = reactive({
+const searchForm = ref({
   name: "",
-  status: "",
+  status: "0",
   deptId: "",
   addUserName: "",
   deptId1: "",
-  typed: "",
+  typed: "-1",
   checkType: "",
   beginTime: "",
   endTime: "",
@@ -62,27 +100,22 @@ const searchForm = reactive({
   level: ""
 });
 
-const searchFormRef = ref<FormInstance>();
-
-// 隐患状态选项
 const statusOptions = [
-  { label: "请选择", value: "" },
-  { label: "提交", value: "提交" },
-  { label: "审批中", value: "审批中" },
-  { label: "整改中", value: "整改中" },
-  { label: "完成", value: "完成" },
-  { label: "超期", value: "超期" },
-  { label: "驳回", value: "驳回" }
+  { label: "请选择", value: "0" },
+  { label: "提交", value: "1" },
+  { label: "审批中", value: "2" },
+  { label: "整改中", value: "3" },
+  { label: "完成", value: "4" },
+  { label: "超期", value: "5" },
+  { label: "驳回", value: "6" }
 ];
 
-// 治理类型选项
-const typedOptions = [
-  { label: "请选择", value: "" },
+const typeOptions = [
+  { label: "请选择", value: "-1" },
   { label: "立即整改", value: "1" },
   { label: "期限整改", value: "2" }
 ];
 
-// 排查类型选项
 const checkTypeOptions = [
   { label: "请选择", value: "" },
   { label: "日常排查", value: "日常排查" },
@@ -105,7 +138,6 @@ const checkTypeOptions = [
   { label: "省平台上传隐患", value: "省平台上传隐患" }
 ];
 
-// 隐患类型选项
 const dangerTypeOptions = [
   { label: "请选择", value: "" },
   { label: "安全", value: "安全" },
@@ -121,8 +153,7 @@ const dangerTypeOptions = [
   { label: "其他", value: "其他" }
 ];
 
-// 隐患分类选项
-const classify1Options = [
+const classifyOptions = [
   { label: "请选择", value: "" },
   { label: "人的不安全行为", value: "人的不安全行为" },
   { label: "物的不安全状态", value: "物的不安全状态" },
@@ -130,7 +161,6 @@ const classify1Options = [
   { label: "管理的缺陷", value: "管理的缺陷" }
 ];
 
-// 隐患等级选项
 const levelOptions = [
   { label: "请选择", value: "" },
   { label: "一级", value: "一级" },
@@ -139,39 +169,16 @@ const levelOptions = [
   { label: "四级", value: "四级" }
 ];
 
-// 获取状态标签类型
-function getStatusType(
-  status: string
-): "success" | "warning" | "danger" | "info" {
-  switch (status) {
-    case "完成":
-      return "success";
-    case "超期":
-    case "驳回":
-      return "danger";
-    case "审批中":
-    case "整改中":
-      return "warning";
-    default:
-      return "info";
+async function fetchDeptOptions() {
+  try {
+    const response = await fetch("/sft/sys/dept/all.json");
+    const data: DeptResponse = await response.json();
+    if (data.success) {
+      deptOptions.value = data.t;
+    }
+  } catch (error) {
+    console.error("获取部门数据失败:", error);
   }
-}
-
-// 格式化日期
-function formatDate(timestamp: number): string {
-  if (!timestamp) return "-";
-  const date = new Date(timestamp);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-// 获取治理类型文本
-function getTypedText(typed?: number): string {
-  if (typed === 1) return "立即整改";
-  if (typed === 2) return "期限整改";
-  return "-";
 }
 
 async function fetchData(page = 1) {
@@ -180,22 +187,30 @@ async function fetchData(page = 1) {
     const params = new URLSearchParams({
       page: String(page),
       size: String(pageSize.value),
-      name: searchForm.name,
-      status: searchForm.status,
-      dangerType: searchForm.dangerType,
-      classify1: searchForm.classify1,
-      level: searchForm.level,
-      checkType: searchForm.checkType
+      name: searchForm.value.name,
+      status: searchForm.value.status,
+      deptId: searchForm.value.deptId || "-1",
+      addUserName: searchForm.value.addUserName,
+      deptId1: searchForm.value.deptId1 || "-1",
+      typed: searchForm.value.typed,
+      checkType: searchForm.value.checkType,
+      beginTime: searchForm.value.beginTime,
+      endTime: searchForm.value.endTime,
+      dangerType: searchForm.value.dangerType,
+      classify1: searchForm.value.classify1,
+      level: searchForm.value.level
     });
 
-    const response = await fetch(`/sft/danger/danger/list.json?${params}`);
+    const response = await fetch(
+      `/sft/danger/danger/list?${params.toString()}`
+    );
     const data: ApiResponse = await response.json();
     if (data.success) {
       tableData.value = data.t.content;
       total.value = data.t.totalElements;
       currentPage.value = page;
     } else {
-      ElMessage.error("获取数据失败");
+      ElMessage.error(data.message || "获取数据失败");
     }
   } catch (error) {
     ElMessage.error("网络请求失败");
@@ -210,35 +225,43 @@ function handleSearch() {
 }
 
 function handleReset() {
-  searchForm.name = "";
-  searchForm.status = "";
-  searchForm.deptId = "";
-  searchForm.addUserName = "";
-  searchForm.deptId1 = "";
-  searchForm.typed = "";
-  searchForm.checkType = "";
-  searchForm.beginTime = "";
-  searchForm.endTime = "";
-  searchForm.dangerType = "";
-  searchForm.classify1 = "";
-  searchForm.level = "";
+  searchForm.value = {
+    name: "",
+    status: "0",
+    deptId: "",
+    addUserName: "",
+    deptId1: "",
+    typed: "-1",
+    checkType: "",
+    beginTime: "",
+    endTime: "",
+    dangerType: "",
+    classify1: "",
+    level: ""
+  };
   fetchData(1);
 }
 
 function handleExport() {
-  ElMessage.info("导出功能待实现");
-}
-
-function handleRewardsAll() {
-  ElMessage.info("批量奖惩功能待实现");
+  const params = new URLSearchParams({
+    level: searchForm.value.level,
+    typed: searchForm.value.typed,
+    status: searchForm.value.status,
+    checkType: searchForm.value.checkType,
+    dangerType: searchForm.value.dangerType,
+    classify1: searchForm.value.classify1,
+    beginTime: searchForm.value.beginTime,
+    endTime: searchForm.value.endTime,
+    name: searchForm.value.name,
+    addUserName: searchForm.value.addUserName,
+    deptId: searchForm.value.deptId || "-1",
+    deptId1: searchForm.value.deptId1 || "-1"
+  });
+  window.open(`/sft/danger/danger/export?${params.toString()}`);
 }
 
 function handleAdd() {
   ElMessage.info("新建功能待实现");
-}
-
-function handleDownloadTemplate() {
-  ElMessage.info("下载模板功能待实现");
 }
 
 function handleImport() {
@@ -246,31 +269,106 @@ function handleImport() {
 }
 
 function handleDelete(row: DangerItem) {
-  ElMessageBox.confirm("确认删除该隐患吗？", "提示", {
+  ElMessageBox.confirm("确认删除该隐患？", "提示", {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
     type: "warning"
   })
-    .then(() => {
-      ElMessage.success("删除成功");
-      fetchData();
+    .then(async () => {
+      try {
+        const response = await fetch(`/sft/danger/danger/del/${row.id}`, {
+          method: "GET"
+        });
+        const data = await response.json();
+        if (data.success) {
+          ElMessage.success("删除成功");
+          fetchData(currentPage.value);
+        } else {
+          ElMessage.error(data.message || "删除失败");
+        }
+      } catch (error) {
+        ElMessage.error("网络请求失败");
+      }
     })
     .catch(() => {});
 }
 
-function handleRewards(row: DangerItem) {
-  ElMessage.info(`奖惩: ${row.name}`);
+function handleRowExport(row: DangerItem) {
+  window.open(`/sft/danger/danger/detail/${row.id}`);
 }
 
-function handleExportRow(row: DangerItem) {
-  ElMessage.info(`导出: ${row.name}`);
+function formatDate(timestamp?: number): string {
+  if (!timestamp) return "";
+  return new Date(timestamp).toLocaleDateString("zh-CN");
 }
 
-function handlePageChange(page: number) {
-  fetchData(page);
+function formatDateTime(timestamp?: number): string {
+  if (!timestamp) return "";
+  const date = new Date(timestamp);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${year}-${month}-${day} ${hours}:${minutes}`;
+}
+
+function getTypeName(type: number): string {
+  return type === 2 ? "期限整改" : "立即整改";
+}
+
+function getApprovalStatus(row: DangerItem): string {
+  if (row.type === 2) {
+    const statusMap: Record<number, string> = {
+      1: "提交",
+      2: "工段管理人员驳回",
+      3: "工段管理人员通过",
+      4: "检查部门负责人驳回",
+      5: "检查部门负责人通过",
+      6: "责任部门接收人驳回",
+      7: "责任部门接收人通过",
+      8: "整改人填写信息",
+      9: "车间安全全员驳回",
+      10: "车间安全全员通过",
+      11: "工段管理人员（二次审批）驳回",
+      12: "结束"
+    };
+    return statusMap[row.termStatus || 0] || "";
+  } else {
+    const statusMap: Record<number, string> = {
+      1: "提交",
+      2: "工段管理人员驳回",
+      3: "工段管理人员通过",
+      4: "检查部门负责人驳回",
+      5: "结束"
+    };
+    return statusMap[row.immeStatus || 0] || "";
+  }
+}
+
+function getResponsibleUser(row: DangerItem): string {
+  if (row.type === 2) {
+    return row.zrbmUser?.ushow || "";
+  }
+  return row.gdUser?.ushow || "";
+}
+
+function getResponsibleDept(row: DangerItem): string {
+  if (row.type === 2) {
+    return row.zrbmUser?.sysDept?.name || "";
+  }
+  return row.gdUser?.sysDept?.name || "";
+}
+
+function getResponsibleDate(row: DangerItem): string {
+  if (row.type === 2) {
+    return formatDateTime(row.zrbmDate);
+  }
+  return formatDateTime(row.gdDate);
 }
 
 onMounted(() => {
+  fetchDeptOptions();
   fetchData();
 });
 </script>
@@ -280,18 +378,12 @@ onMounted(() => {
     <el-card shadow="never">
       <template #header>
         <div class="card-header">
-          <span class="text-lg font-medium">隐患</span>
+          <span class="text-lg font-medium">隐患管理</span>
         </div>
       </template>
 
-      <!-- 搜索表单 -->
-      <el-form
-        ref="searchFormRef"
-        :model="searchForm"
-        inline
-        class="search-form"
-      >
-        <el-form-item label="隐患描述" prop="name">
+      <el-form ref="formRef" :model="searchForm" inline class="search-form">
+        <el-form-item label="隐患描述">
           <el-input
             v-model="searchForm.name"
             placeholder="请输入隐患描述"
@@ -299,12 +391,12 @@ onMounted(() => {
             style="width: 200px"
           />
         </el-form-item>
-        <el-form-item label="隐患状态" prop="status">
+
+        <el-form-item label="隐患状态">
           <el-select
             v-model="searchForm.status"
             placeholder="请选择"
-            clearable
-            style="width: 120px"
+            style="width: 150px"
           >
             <el-option
               v-for="item in statusOptions"
@@ -314,20 +406,25 @@ onMounted(() => {
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="隐患上传部门" prop="deptId">
+
+        <el-form-item label="隐患上传部门">
           <el-select
             v-model="searchForm.deptId"
-            placeholder="请选择隐患上传部门"
+            placeholder="请选择"
             clearable
-            style="width: 180px"
+            filterable
+            style="width: 200px"
           >
-            <el-option label="办公室（党委办公室）" value="4" />
-            <el-option label="HSE管理部" value="9" />
-            <el-option label="运营管理部" value="11" />
-            <el-option label="热电车间" value="22" />
+            <el-option
+              v-for="item in deptOptions"
+              :key="item.id"
+              :label="item.name"
+              :value="String(item.value)"
+            />
           </el-select>
         </el-form-item>
-        <el-form-item label="隐患上传人" prop="addUserName">
+
+        <el-form-item label="隐患上传人">
           <el-input
             v-model="searchForm.addUserName"
             placeholder="请输入隐患上传人"
@@ -335,40 +432,45 @@ onMounted(() => {
             style="width: 150px"
           />
         </el-form-item>
-        <el-form-item label="责任接收部门" prop="deptId1">
+
+        <el-form-item label="责任接收部门">
           <el-select
             v-model="searchForm.deptId1"
-            placeholder="请选择责任接收部门"
+            placeholder="请选择"
             clearable
-            style="width: 180px"
+            filterable
+            style="width: 200px"
           >
-            <el-option label="办公室（党委办公室）" value="4" />
-            <el-option label="HSE管理部" value="9" />
-            <el-option label="运营管理部" value="11" />
-            <el-option label="热电车间" value="22" />
+            <el-option
+              v-for="item in deptOptions"
+              :key="item.id"
+              :label="item.name"
+              :value="String(item.value)"
+            />
           </el-select>
         </el-form-item>
-        <el-form-item label="治理类型" prop="typed">
+
+        <el-form-item label="治理类型">
           <el-select
             v-model="searchForm.typed"
             placeholder="请选择"
-            clearable
             style="width: 120px"
           >
             <el-option
-              v-for="item in typedOptions"
+              v-for="item in typeOptions"
               :key="item.value"
               :label="item.label"
               :value="item.value"
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="排查类型" prop="checkType">
+
+        <el-form-item label="排查类型">
           <el-select
             v-model="searchForm.checkType"
             placeholder="请选择"
             clearable
-            style="width: 150px"
+            style="width: 180px"
           >
             <el-option
               v-for="item in checkTypeOptions"
@@ -378,25 +480,26 @@ onMounted(() => {
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="上传日期" prop="beginTime">
+
+        <el-form-item label="上传日期">
           <el-date-picker
             v-model="searchForm.beginTime"
             type="date"
-            placeholder="yyyy-MM-dd"
+            placeholder="开始日期"
             value-format="YYYY-MM-DD"
             style="width: 140px"
           />
-        </el-form-item>
-        <el-form-item label="—" prop="endTime">
+          <span class="mx-2">—</span>
           <el-date-picker
             v-model="searchForm.endTime"
             type="date"
-            placeholder="yyyy-MM-dd"
+            placeholder="结束日期"
             value-format="YYYY-MM-DD"
             style="width: 140px"
           />
         </el-form-item>
-        <el-form-item label="隐患类型" prop="dangerType">
+
+        <el-form-item label="隐患类型">
           <el-select
             v-model="searchForm.dangerType"
             placeholder="请选择"
@@ -411,22 +514,24 @@ onMounted(() => {
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="隐患分类" prop="classify1">
+
+        <el-form-item label="隐患分类">
           <el-select
             v-model="searchForm.classify1"
             placeholder="请选择"
             clearable
-            style="width: 150px"
+            style="width: 180px"
           >
             <el-option
-              v-for="item in classify1Options"
+              v-for="item in classifyOptions"
               :key="item.value"
               :label="item.label"
               :value="item.value"
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="隐患等级" prop="level">
+
+        <el-form-item label="隐患等级">
           <el-select
             v-model="searchForm.level"
             placeholder="请选择"
@@ -441,118 +546,140 @@ onMounted(() => {
             />
           </el-select>
         </el-form-item>
+
+        <el-form-item>
+          <el-button type="primary" @click="handleSearch"> 检索 </el-button>
+          <el-button @click="handleReset"> 重置 </el-button>
+          <el-button @click="handleExport"> 导出 </el-button>
+          <el-button type="success" @click="handleAdd"> 新建 </el-button>
+          <el-button @click="handleImport"> 导入 </el-button>
+        </el-form-item>
       </el-form>
+    </el-card>
 
-      <!-- 操作按钮 -->
-      <div class="btn-group">
-        <el-button type="primary" @click="handleSearch">
-          <el-icon><Search /></el-icon>
-          检索
-        </el-button>
-        <el-button @click="handleReset">
-          <el-icon><RefreshLeft /></el-icon>
-          重置
-        </el-button>
-        <el-button @click="handleExport">
-          <el-icon><Download /></el-icon>
-          导出
-        </el-button>
-        <el-button @click="handleRewardsAll">
-          <el-icon><Medal /></el-icon>
-          奖惩
-        </el-button>
-        <el-button type="success" @click="handleAdd">
-          <el-icon><Plus /></el-icon>
-          新建
-        </el-button>
-        <el-button type="warning" @click="handleDownloadTemplate">
-          <el-icon><Download /></el-icon>
-          下载模板
-        </el-button>
-        <el-button type="info" @click="handleImport">
-          <el-icon><Upload /></el-icon>
-          导入
-        </el-button>
-      </div>
-
-      <!-- 数据表格 -->
+    <el-card shadow="never" class="mt-4">
       <el-table
         v-loading="loading"
         :data="tableData"
         stripe
         border
-        style="width: 100%; margin-top: 16px"
+        style="width: 100%"
       >
         <el-table-column type="index" label="序号" width="60" align="center" />
+        <el-table-column type="selection" width="55" align="center" />
+
         <el-table-column
           prop="name"
           label="隐患描述"
-          min-width="250"
+          min-width="150"
           show-overflow-tooltip
         />
-        <el-table-column
-          prop="status"
-          label="隐患状态"
-          width="100"
-          align="center"
-        >
+
+        <el-table-column label="治理类型" width="100" align="center">
           <template #default="{ row }">
-            <el-tag :type="getStatusType(row.status)">
-              {{ row.status }}
-            </el-tag>
+            {{ getTypeName(row.type) }}
           </template>
         </el-table-column>
-        <el-table-column
-          prop="dangerType"
-          label="隐患类型"
-          width="90"
-          align="center"
-        />
-        <el-table-column
-          prop="classify1"
-          label="隐患分类"
-          width="120"
-          align="center"
-        />
+
+        <el-table-column prop="status" label="状态" width="80" align="center" />
+
+        <el-table-column label="审批状态" width="150" align="center">
+          <template #default="{ row }">
+            {{ getApprovalStatus(row) }}
+          </template>
+        </el-table-column>
+
         <el-table-column
           prop="level"
           label="隐患等级"
-          width="90"
+          width="100"
           align="center"
         />
-        <el-table-column label="治理类型" width="100" align="center">
+
+        <el-table-column
+          prop="dangerType"
+          label="隐患类型"
+          width="100"
+          align="center"
+        />
+
+        <el-table-column
+          prop="classify1"
+          label="中化隐患分类（一）"
+          width="150"
+          align="center"
+          show-overflow-tooltip
+        />
+
+        <el-table-column
+          prop="checkType"
+          label="排查类型"
+          width="130"
+          align="center"
+          show-overflow-tooltip
+        />
+
+        <el-table-column label="整改完成时间" width="120" align="center">
           <template #default="{ row }">
-            {{ getTypedText(row.typed) }}
+            {{ formatDate(row.rectifyDate) }}
           </template>
         </el-table-column>
-        <el-table-column prop="checkType" label="排查类型" width="120" />
-        <el-table-column label="上传部门" width="150">
+
+        <el-table-column
+          label="责任部门"
+          width="150"
+          align="center"
+          show-overflow-tooltip
+        >
           <template #default="{ row }">
-            {{ row.addDept?.name || "-" }}
+            {{ getResponsibleDept(row) }}
           </template>
         </el-table-column>
-        <el-table-column label="上传人" width="100">
+
+        <el-table-column label="责任部门接收人" width="120" align="center">
           <template #default="{ row }">
-            {{ row.addUser?.ushow || "-" }}
+            {{ getResponsibleUser(row) }}
           </template>
         </el-table-column>
+
+        <el-table-column label="整改人" width="100" align="center">
+          <template #default="{ row }">
+            {{ row.rectUser?.ushow || "" }}
+          </template>
+        </el-table-column>
+
+        <el-table-column label="隐患上传人" width="100" align="center">
+          <template #default="{ row }">
+            {{ row.addUser?.ushow || "" }}
+          </template>
+        </el-table-column>
+
+        <el-table-column
+          label="隐患上传部门"
+          width="150"
+          align="center"
+          show-overflow-tooltip
+        >
+          <template #default="{ row }">
+            {{ row.addUser?.sysDept?.name || "" }}
+          </template>
+        </el-table-column>
+
         <el-table-column label="上传日期" width="110" align="center">
           <template #default="{ row }">
             {{ formatDate(row.addDate) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="200" align="center" fixed="right">
+
+        <el-table-column label="操作" width="180" align="center" fixed="right">
           <template #default="{ row }">
             <el-button type="danger" size="small" @click="handleDelete(row)">
               删除
             </el-button>
-            <el-button type="warning" size="small" @click="handleRewards(row)">
-              奖惩
-            </el-button>
             <el-button
               type="primary"
               size="small"
-              @click="handleExportRow(row)"
+              @click="handleRowExport(row)"
             >
               导出
             </el-button>
@@ -560,17 +687,17 @@ onMounted(() => {
         </el-table-column>
       </el-table>
 
-      <!-- 分页 -->
-      <el-pagination
-        v-model:current-page="currentPage"
-        v-model:page-size="pageSize"
-        :total="total"
-        :page-sizes="[10, 20, 50, 100]"
-        layout="total, sizes, prev, pager, next, jumper"
-        style="justify-content: flex-end; margin-top: 16px"
-        @current-change="handlePageChange"
-        @size-change="() => fetchData(1)"
-      />
+      <div class="mt-4 flex justify-end">
+        <el-pagination
+          v-model:current-page="currentPage"
+          v-model:page-size="pageSize"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="total"
+          layout="total, sizes, prev, pager, next, jumper"
+          @current-change="fetchData"
+          @size-change="() => fetchData(1)"
+        />
+      </div>
     </el-card>
   </div>
 </template>
@@ -586,13 +713,8 @@ onMounted(() => {
 }
 
 .search-form {
-  margin-bottom: 16px;
-}
-
-.btn-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 16px;
+  .el-form-item {
+    margin-bottom: 12px;
+  }
 }
 </style>
