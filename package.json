@@ -36,6 +36,10 @@
     "test:e2e:sft:train:pc:plan": "npx tsx tests/e2e/sftTrainPcPlan.spec.ts",
     "test:e2e:sft:cont:per:hmd": "npx tsx tests/e2e/sftContPerHmd.spec.ts",
     "test:e2e:sft:data:gds:index": "npx tsx tests/e2e/sftDataGds.spec.ts",
+    "test:e2e:sft:emerresour:config:index": "npx tsx tests/e2e/sftEmerresourConfig.spec.ts",
+    "test:e2e:sft:work:data": "npx tsx tests/e2e/sftWorkData.spec.ts",
+    "test:e2e:sft:insp:task": "npx tsx tests/e2e/sftInspTask.spec.ts",
+    "test:e2e:sft:danger:plan": "npx tsx tests/e2e/sftDangerPlan.spec.ts",
     "prepare": "husky",
     "preinstall": "npx only-allow pnpm"
   },
