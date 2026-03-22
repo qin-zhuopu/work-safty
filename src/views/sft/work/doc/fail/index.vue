@@ -12,26 +12,31 @@ interface DeptOption {
   value: number;
 }
 
+interface DocInfo {
+  id: string;
+  title: string;
+  docNo: string;
+  failType: string;
+  failReason: string;
+  createTime: number;
+  dept: { name: string };
+  user: { ushow: string };
+  act: {
+    id: string;
+    jsaNo: string;
+    beginTime: number;
+    endTime: number;
+    status: number;
+    nodeStatus: number;
+    content: string;
+  };
+}
+
 interface FailItem {
   id: string;
   deptName: string;
-  endTime: number;
-  start_time: number;
-  sync: number;
   zynr: string;
-  doc: {
-    act: {
-      id: string;
-      jsaNo: string;
-      beginTime: number;
-      endTime: number;
-      status: number;
-      nodeStatus: number;
-      content: string;
-      user?: { ushow?: string };
-      dept?: { name?: string };
-    };
-  };
+  doc: DocInfo;
 }
 
 interface ApiResponse {
@@ -159,19 +164,27 @@ function handleReset() {
 }
 
 function handleExport() {
-  ElMessage.info("导出功能待实现");
+  const params = new URLSearchParams();
+  if (searchForm.failType) params.append("failType", searchForm.failType);
+  if (searchForm.deptId) params.append("deptId", searchForm.deptId);
+  if (searchForm.title) params.append("title", searchForm.title);
+  if (searchForm.name) params.append("name", searchForm.name);
+  if (searchForm.startTime) params.append("startTime", searchForm.startTime);
+  if (searchForm.endTime) params.append("endTime", searchForm.endTime);
+
+  window.open(`/sft/work/doc/exportFails?${params.toString()}`);
 }
 
 function handleDetail(row: FailItem) {
-  ElMessage.info(`详情: ${row.doc.act.id}`);
+  window.open(`/sft/work/doc/detail/${row.doc.id}`);
 }
 
 function handleExamine(row: FailItem) {
-  ElMessage.info(`审验: ${row.doc.act.id}`);
+  ElMessage.info(`审验弹窗: ${row.doc.id}`);
 }
 
 function handleDelete(row: FailItem) {
-  ElMessageBox.confirm("确认删除？", "提示", {
+  ElMessageBox.confirm("确认删除该票证审验记录？", "提示", {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
     type: "warning"
@@ -186,31 +199,6 @@ function handleDelete(row: FailItem) {
 function formatDate(timestamp: number): string {
   if (!timestamp) return "-";
   return new Date(timestamp).toLocaleDateString("zh-CN");
-}
-
-function getStatusText(status: number): string {
-  const statusMap: Record<number, string> = {
-    0: "待提交",
-    1: "待审批",
-    2: "已审批",
-    3: "已驳回"
-  };
-  return statusMap[status] || "未知";
-}
-
-function getNodeType(type: string): string {
-  const typeMap: Record<string, string> = {
-    动火: "动火作业",
-    受限: "受限空间",
-    高处: "高处作业",
-    架设: "高处架设",
-    临时用电安全作业证: "临时用电",
-    盲板: "盲板抽堵",
-    吊装: "吊装作业",
-    动土: "动土作业",
-    断路: "断路作业"
-  };
-  return typeMap[type] || type;
 }
 
 onMounted(() => {
@@ -318,40 +306,54 @@ onMounted(() => {
         style="width: 100%"
       >
         <el-table-column type="index" label="序号" width="60" align="center" />
-        <el-table-column prop="deptName" label="部门" min-width="120" />
-        <el-table-column prop="zynr" label="作业内容" min-width="200" />
-        <el-table-column
-          prop="doc.act.jsaNo"
-          label="票证编号"
-          min-width="150"
-        />
-        <el-table-column label="开始时间" min-width="120">
+        <el-table-column label="标题" min-width="120">
           <template #default="{ row }">
-            {{ formatDate(row.doc.act.beginTime) }}
+            {{ row.doc?.title || "-" }}
           </template>
         </el-table-column>
-        <el-table-column label="结束时间" min-width="120">
+        <el-table-column label="属地工段" min-width="120">
           <template #default="{ row }">
-            {{ formatDate(row.doc.act.endTime) }}
+            {{ row.doc?.dept?.name || "-" }}
           </template>
         </el-table-column>
-        <el-table-column label="状态" width="100" align="center">
+        <el-table-column prop="deptName" label="申请部门" min-width="120" />
+        <el-table-column label="申请人" width="100">
           <template #default="{ row }">
-            <el-tag
-              :type="
-                row.doc.act.status === 2
-                  ? 'success'
-                  : row.doc.act.status === 3
-                    ? 'danger'
-                    : 'warning'
-              "
-            >
-              {{ getStatusText(row.doc.act.status) }}
-            </el-tag>
+            {{ row.doc?.user?.ushow || "-" }}
           </template>
         </el-table-column>
-        <el-table-column prop="doc.act.user.ushow" label="创建人" width="100" />
-        <el-table-column label="操作" width="200" align="center" fixed="right">
+        <el-table-column label="作业证编号" min-width="140">
+          <template #default="{ row }">
+            {{ row.doc?.docNo || "-" }}
+          </template>
+        </el-table-column>
+        <el-table-column label="状态" width="80" align="center">
+          <template #default>
+            <el-tag type="danger">不合格</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="关联JSA编号" min-width="140">
+          <template #default="{ row }">
+            {{ row.doc?.act?.jsaNo || "-" }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="zynr" label="名称" min-width="150" />
+        <el-table-column label="创建时间" width="110">
+          <template #default="{ row }">
+            {{ formatDate(row.doc?.createTime) }}
+          </template>
+        </el-table-column>
+        <el-table-column label="审验错误类型" min-width="140">
+          <template #default="{ row }">
+            {{ row.doc?.failType || "-" }}
+          </template>
+        </el-table-column>
+        <el-table-column label="原因" min-width="150">
+          <template #default="{ row }">
+            {{ row.doc?.failReason || "-" }}
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="180" align="center" fixed="right">
           <template #default="{ row }">
             <el-button
               type="primary"

@@ -101,8 +101,9 @@ async function testFailPage(page: Page): Promise<void> {
   // 5. 验证列是否存在
   const headers = await page.locator(".el-table__header th").allTextContents();
   console.log("表头列:", headers.filter(h => h.trim()).slice(0, 6));
-  expect(headers.some(h => h.includes("部门"))).toBeTruthy();
-  expect(headers.some(h => h.includes("作业内容"))).toBeTruthy();
+  expect(headers.some(h => h.includes("申请部门"))).toBeTruthy();
+  expect(headers.some(h => h.includes("标题"))).toBeTruthy();
+  expect(headers.some(h => h.includes("状态"))).toBeTruthy();
 
   // 6. 验证操作按钮
   const detailBtn = page.locator('button:has-text("详情")');
