@@ -47,6 +47,7 @@
     "test:e2e:sft:work:doc:pl": "npx tsx tests/e2e/sftWorkDocPl.spec.ts",
     "test:e2e:sft:insp:site": "npx tsx tests/e2e/sftInspSite.spec.ts",
     "test:e2e:sft:work:loc": "npx tsx tests/e2e/sftWorkLoc.spec.ts",
+    "test:e2e:sft:sys:dept": "npx tsx tests/e2e/sftSysDept.spec.ts",
     "prepare": "husky",
     "preinstall": "npx only-allow pnpm"
   },
