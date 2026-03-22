@@ -14,7 +14,7 @@ export default {
     {
       path: "/sft/work/doc/statistics/index",
       name: "SftWorkDocStatisticsIndex",
-      component: () => import("@/views/sft/work/doc/statistics.vue"),
+      component: () => import("@/views/sft/work/doc/statistics/index.vue"),
       meta: {
         title: "特殊作业分析",
         showLink: true
