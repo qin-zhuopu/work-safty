@@ -92,6 +92,7 @@
     "test:e2e:sft:resum:plan": "npx tsx tests/e2e/sftResumPlan.spec.ts",
     "test:e2e:sft:danger:law": "npx tsx tests/e2e/sftDangerLaw.spec.ts",
     "test:e2e:sft:insp:approval:library": "npx tsx tests/e2e/sftInspApprovalLibrary.spec.ts",
+    "test:e2e:sft:sys:approval:library": "npx tsx tests/e2e/sftSysApprovalLibrary.spec.ts",
     "prepare": "husky",
     "preinstall": "npx only-allow pnpm"
   },
