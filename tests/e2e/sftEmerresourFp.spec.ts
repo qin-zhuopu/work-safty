@@ -23,7 +23,11 @@ async function connectToChrome(port: number = DEFAULT_CDP_PORT) {
     const browser = await chromium.connectOverCDP(cdpUrl);
     return browser;
   } catch {
-    throw new Error(`无法连接到 Chrome CDP (${cdpUrl})`);
+    throw new Error(
+      `无法连接到 Chrome CDP (${cdpUrl})\n` +
+        `请确保 Chrome 已启动调试模式：\n` +
+        `/Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome --remote-debugging-port=${port}`
+    );
   }
 }
 
@@ -83,17 +87,12 @@ async function testFpPage(page: Page): Promise<void> {
   expect(title).toContain("防汛物资台账");
   console.log("✓ 页面标题正确");
 
-  // 2. 验证表格存在
-  const table = page.locator(".el-table");
-  await expect(table.first()).toBeVisible();
-  console.log("✓ 表格已渲染");
-
-  // 3. 验证搜索栏
+  // 2. 验证搜索表单存在
   const deptSelect = page.locator(".el-select");
   await expect(deptSelect.first()).toBeVisible();
-  console.log("✓ 搜索栏存在");
+  console.log("✓ 搜索表单已渲染");
 
-  // 4. 验证操作按钮
+  // 3. 验证操作按钮存在
   const buttons = [
     "查询",
     "重置",
@@ -109,25 +108,32 @@ async function testFpPage(page: Page): Promise<void> {
     const count = await btn.count();
     if (count > 0) {
       console.log(`✓ 按钮"${btnText}"存在`);
+    } else {
+      console.log(`⚠ 按钮"${btnText}"未找到`);
     }
   }
 
-  // 5. 验证数据行
+  // 4. 验证表格存在
+  const table = page.locator(".el-table");
+  await expect(table.first()).toBeVisible();
+  console.log("✓ 表格已渲染");
+
+  // 5. 验证表头
+  const headers = await page.locator(".el-table__header th").allTextContents();
+  console.log("表头列:", headers.filter(h => h.trim()).slice(0, 8));
+
+  // 6. 验证数据行
   const dataRows = await page.locator(".el-table__body .el-table__row").count();
   expect(dataRows).toBeGreaterThan(0);
   console.log(`✓ 数据行数: ${dataRows}`);
 
-  // 6. 验证第一行数据
+  // 7. 验证第一行数据
   const firstRowCells = await page
     .locator(".el-table__body .el-table__row")
     .first()
     .locator("td")
     .allTextContents();
-  console.log("第一行数据:", firstRowCells.slice(0, 4).join(" | "));
-
-  // 7. 验证表头
-  const headers = await page.locator(".el-table__header th").allTextContents();
-  console.log("表头列:", headers.filter(h => h.trim()).slice(0, 8));
+  console.log("第一行数据:", firstRowCells.slice(0, 5).join(" | "));
 
   // 8. 验证操作列按钮
   const firstRowOps = page
@@ -138,14 +144,28 @@ async function testFpPage(page: Page): Promise<void> {
   expect(opCount).toBeGreaterThanOrEqual(3);
   console.log(`✓ 操作列按钮数: ${opCount}`);
 
-  // 9. 验证分页
+  // 9. 测试搜索功能
+  console.log("\n测试搜索功能...");
+  const searchInput = page.locator('input[placeholder*="请输入名称"]');
+  await searchInput.first().fill("沙袋");
+  await page.click('.el-button:has-text("查询")');
+  await page.waitForTimeout(500);
+  console.log("✓ 搜索操作完成");
+
+  // 10. 测试重置功能
+  console.log("\n测试重置功能...");
+  await page.click('.el-button:has-text("重置")');
+  await page.waitForTimeout(500);
+  console.log("✓ 重置操作完成");
+
+  // 11. 验证分页器
   const pagination = page.locator(".el-pagination");
   const pagCount = await pagination.count();
   if (pagCount > 0) {
-    console.log("✓ 分页组件存在");
+    console.log("✓ 分页器已渲染");
   }
 
-  // 10. 截图
+  // 12. 截图
   await page.screenshot({
     path: "screenshots/sft-emerresour-fp.png",
     fullPage: true

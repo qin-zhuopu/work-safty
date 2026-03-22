@@ -1,8 +1,8 @@
 const Layout = () => import("@/layout/index.vue");
 
 export default {
-  path: "/sft",
-  name: "Sft",
+  path: "/sft/emerresour",
+  name: "SftEmerresourFp",
   component: Layout,
   redirect: "/sft/emerresour/fp/index",
   meta: {
@@ -13,7 +13,7 @@ export default {
   children: [
     {
       path: "/sft/emerresour/fp/index",
-      name: "SftEmerresourFp",
+      name: "SftEmerresourFpIndex",
       component: () => import("@/views/sft/emerresour/fp/index.vue"),
       meta: {
         title: "防汛物资台账",
