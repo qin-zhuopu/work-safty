@@ -14,7 +14,7 @@ export default {
     {
       path: "/sft/work/doc/monitor",
       name: "SftWorkDocMonitor",
-      component: () => import("@/views/sft/work/doc/monitor.vue"),
+      component: () => import("@/views/sft/work/doc/monitor/index.vue"),
       meta: {
         title: "特殊作业移动监测监控",
         showLink: true
