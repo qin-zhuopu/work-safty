@@ -19,6 +19,9 @@ import dayIcon from "@/assets/svg/day.svg?component";
 import darkIcon from "@/assets/svg/dark.svg?component";
 import Lock from "~icons/ri/lock-fill";
 import User from "~icons/ri/user-3-fill";
+import Key from "~icons/ri/key-fill";
+import ViewIcon from "~icons/ri/eye-fill";
+import HideIcon from "~icons/ri/eye-off-fill";
 
 defineOptions({
   name: "Login"
@@ -28,6 +31,8 @@ const router = useRouter();
 const loading = ref(false);
 const disabled = ref(false);
 const ruleFormRef = ref<FormInstance>();
+const captchaUrl = ref("/sft/pub/data/captcha");
+const showPassword = ref(false);
 
 const { initStorage } = useLayout();
 initStorage();
@@ -38,7 +43,8 @@ const { title } = useNav();
 
 const ruleForm = reactive({
   username: "admin",
-  password: "admin123"
+  password: "admin123",
+  verCode: ""
 });
 
 const onLogin = async (formEl: FormInstance | undefined) => {
@@ -65,12 +71,29 @@ const onLogin = async (formEl: FormInstance | undefined) => {
             });
           } else {
             message("登录失败", { type: "error" });
+            refreshCaptcha();
           }
+        })
+        .catch(() => {
+          message("登录失败", { type: "error" });
+          refreshCaptcha();
         })
         .finally(() => (loading.value = false));
     }
   });
 };
+
+function refreshCaptcha() {
+  captchaUrl.value = `/sft/pub/data/captcha?t=${Date.now()}`;
+}
+
+function togglePassword() {
+  showPassword.value = !showPassword.value;
+}
+
+function handleForgetPassword() {
+  message("请联系系统管理员重置密码!", { type: "info" });
+}
 
 const immediateDebounce: any = debounce(
   formRef => onLogin(formRef),
@@ -143,10 +166,51 @@ useEventListener(document, "keydown", ({ code }) => {
                 <el-input
                   v-model="ruleForm.password"
                   clearable
-                  show-password
+                  :type="showPassword ? 'text' : 'password'"
                   placeholder="密码"
                   :prefix-icon="useRenderIcon(Lock)"
-                />
+                >
+                  <template #suffix>
+                    <el-icon class="cursor-pointer" @click="togglePassword">
+                      <component
+                        :is="
+                          showPassword
+                            ? useRenderIcon(ViewIcon)
+                            : useRenderIcon(HideIcon)
+                        "
+                      />
+                    </el-icon>
+                  </template>
+                </el-input>
+              </el-form-item>
+            </Motion>
+
+            <Motion :delay="200">
+              <el-form-item
+                :rules="[
+                  {
+                    required: true,
+                    message: '请输入验证码',
+                    trigger: 'blur'
+                  }
+                ]"
+                prop="verCode"
+              >
+                <div class="w-full flex gap-2">
+                  <el-input
+                    v-model="ruleForm.verCode"
+                    clearable
+                    placeholder="验证码"
+                    :prefix-icon="useRenderIcon(Key)"
+                    class="flex-1"
+                  />
+                  <img
+                    :src="captchaUrl"
+                    class="captcha-image"
+                    alt="验证码"
+                    @click="refreshCaptcha"
+                  />
+                </div>
               </el-form-item>
             </Motion>
 
@@ -162,6 +226,17 @@ useEventListener(document, "keydown", ({ code }) => {
                 登录
               </el-button>
             </Motion>
+
+            <Motion :delay="300">
+              <div class="flex justify-between mt-2 text-sm">
+                <a
+                  class="text-gray-500 hover:text-primary cursor-pointer"
+                  @click="handleForgetPassword"
+                >
+                  忘记密码？
+                </a>
+              </div>
+            </Motion>
           </el-form>
         </div>
       </div>
@@ -171,9 +246,20 @@ useEventListener(document, "keydown", ({ code }) => {
 
 <style scoped>
 @import url("@/style/login.css");
-</style>
 
-<style lang="scss" scoped>
+.captcha-image {
+  width: 100px;
+  height: 40px;
+  cursor: pointer;
+  border: 1px solid var(--el-border-color);
+  border-radius: 4px;
+  transition: border-color 0.3s;
+}
+
+.captcha-image:hover {
+  border-color: var(--el-color-primary);
+}
+
 :deep(.el-input-group__append, .el-input-group__prepend) {
   padding: 0;
 }
