@@ -52,6 +52,7 @@
     "test:e2e:sft:cont:manage:ledger": "npx tsx tests/e2e/sftContManageLedger.spec.ts",
     "test:e2e:sft:work:cs": "npx tsx tests/e2e/sftWorkCs.spec.ts",
     "test:e2e:sft:emerresour:ma": "npx tsx tests/e2e/sftEmerresourMa.spec.ts",
+    "test:e2e:sft:emerresour:fp": "npx tsx tests/e2e/sftEmerresourFp.spec.ts",
     "test:e2e:sft:train:plan": "npx tsx tests/e2e/sftTrainPlan.spec.ts",
     "prepare": "husky",
     "preinstall": "npx only-allow pnpm"
