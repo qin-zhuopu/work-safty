@@ -78,6 +78,7 @@
     "test:e2e:sft:console": "npx tsx tests/e2e/sftConsole.spec.ts",
     "test:e2e:sft:hazard:statistics": "npx tsx tests/e2e/sftHazardStatistics.spec.ts",
     "test:e2e:sft:work:doc:monitor": "npx tsx tests/e2e/sftWorkDocMonitor.spec.ts",
+    "test:e2e:sft:work:doccamera": "npx tsx tests/e2e/sftWorkDoccamera.spec.ts",
     "prepare": "husky",
     "preinstall": "npx only-allow pnpm"
   },
