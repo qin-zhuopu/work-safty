@@ -99,6 +99,7 @@
     "test:e2e:sft:work:plan": "npx tsx tests/e2e/sftWorkPlan.spec.ts",
     "test:e2e:sft:hazard:mhs": "npx tsx tests/e2e/sftHazardMhs.spec.ts",
     "test:e2e:sft:emerresour:wm": "npx tsx tests/e2e/sftEmerresourWm.spec.ts",
+    "test:e2e:resum:content": "npx tsx tests/e2e/resumContent.spec.ts",
     "prepare": "husky",
     "preinstall": "npx only-allow pnpm"
   },

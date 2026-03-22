@@ -19,6 +19,15 @@ export default {
         title: "排查计划统计",
         showLink: true
       }
+    },
+    {
+      path: "/resum/content",
+      name: "ResumContent",
+      component: () => import("@/views/resum/content/index.vue"),
+      meta: {
+        title: "履职排查内容",
+        showLink: true
+      }
     }
   ]
 } satisfies RouteConfigsTable;
