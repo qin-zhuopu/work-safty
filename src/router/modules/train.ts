@@ -37,6 +37,15 @@ export default {
         title: "模拟答题记录",
         showLink: true
       }
+    },
+    {
+      path: "/train/pc/mock/index",
+      name: "TrainPcMock",
+      component: () => import("@/views/train/pc/mock/index.vue"),
+      meta: {
+        title: "模拟答题",
+        showLink: true
+      }
     }
   ]
 } satisfies RouteConfigsTable;
