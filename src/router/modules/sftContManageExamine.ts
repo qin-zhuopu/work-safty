@@ -19,6 +19,15 @@ export default {
         title: "承包商审批",
         showLink: true
       }
+    },
+    {
+      path: "/sft/cont/per/examineper/index",
+      name: "SftContPerExamineperIndex",
+      component: () => import("@/views/sft/cont/per/examineper/index.vue"),
+      meta: {
+        title: "承包商人员审批",
+        showLink: true
+      }
     }
   ]
 } satisfies RouteConfigsTable;
