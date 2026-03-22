@@ -31,6 +31,7 @@
     "test:e2e:train:pc:mock:index": "npx tsx tests/e2e/train-pc-mock.spec.ts",
     "test:e2e:emergency:drill": "npx tsx tests/e2e/emergencyDrill.spec.ts",
     "test:e2e:train:edu:index": "npx tsx tests/e2e/trainEdu.spec.ts",
+    "test:e2e:sft:risk:special": "npx tsx tests/e2e/sftRiskSpecial.spec.ts",
     "prepare": "husky",
     "preinstall": "npx only-allow pnpm"
   },
