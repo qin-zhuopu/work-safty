@@ -1,28 +1,40 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import type { FormInstance } from "element-plus";
 
 defineOptions({
   name: "SftContTool"
 });
 
+interface UserInfo {
+  id: number;
+  ushow: string;
+  cardNo: string;
+  company: {
+    id: number;
+    name: string;
+  };
+}
+
 interface ToolItem {
-  id: string;
-  field: string;
-  field1: string;
-  field2: string;
-  field3: string;
-  field4: string;
-  field5: string;
-  field6: string;
-  field7: string;
-  field8?: string;
-  field9?: { name: string };
-  field10?: { ushow: string };
-  field11?: string;
-  field12?: { ushow: string };
-  pics?: Array<{ name: string; url: string }>;
+  id: number;
+  field: string; // 序列号
+  field1: string; // 名称
+  field2: string; // 类别 (01-08)
+  field3: string; // 型号
+  field4: string; // 使用人
+  field5: string; // 负责人
+  field6: string; // 备注
+  field7: string; // 审批状态
+  field8: number; // 审批时间
+  field9: {
+    id: number;
+    name: string;
+  }; // 申请单位
+  field10: UserInfo; // 申请人
+  field11: number; // 申请时间
+  field12: UserInfo; // 审批人
+  pics: string[]; // 照片
 }
 
 interface ApiResponse {
@@ -30,18 +42,48 @@ interface ApiResponse {
   t: {
     content: ToolItem[];
     totalElements: number;
+    totalPages: number;
+    size: number;
+    number: number;
   };
 }
 
-interface SearchForm {
-  field1: string;
-  field2: string;
-  field3: string;
-  field7: string;
-  startTime: string;
-  endTime: string;
-}
+const CATEGORY_OPTIONS = [
+  { label: "梯子", value: "01" },
+  { label: "手持电动工具", value: "02" },
+  { label: "配电箱", value: "03" },
+  { label: "电焊机", value: "04" },
+  { label: "等离子切割机", value: "05" },
+  { label: "手拉葫芦（包括电动葫芦）", value: "06" },
+  { label: "电动器具", value: "07" },
+  { label: "其他类", value: "08" }
+];
 
+const STATUS_OPTIONS = [
+  { label: "未审批", value: "未审批" },
+  { label: "合格", value: "合格" },
+  { label: "不合格", value: "不合格" }
+];
+
+const tableData = ref<ToolItem[]>([]);
+const loading = ref(false);
+const total = ref(0);
+const currentPage = ref(1);
+const pageSize = ref(10);
+
+// 搜索表单
+const searchForm = ref({
+  field1: "", // 名称
+  field2: "", // 类别
+  field3: "", // 申请单位
+  field7: "", // 审批状态
+  startTime: "", // 申请开始时间
+  endTime: "" // 申请结束时间
+});
+
+const selectedRows = ref<ToolItem[]>([]);
+
+// 类别映射
 const categoryMap: Record<string, string> = {
   "01": "梯子",
   "02": "手持电动工具",
@@ -53,42 +95,19 @@ const categoryMap: Record<string, string> = {
   "08": "其他类"
 };
 
-const categoryOptions = Object.entries(categoryMap).map(([value, label]) => ({
-  value,
-  label
-}));
-
-const statusOptions = [
-  { value: "未审批", label: "未审批" },
-  { value: "合格", label: "合格" },
-  { value: "不合格", label: "不合格" }
-];
-
-const tableData = ref<ToolItem[]>([]);
-const loading = ref(false);
-const searchFormRef = ref<FormInstance>();
-const searchForm = ref<SearchForm>({
-  field1: "",
-  field2: "",
-  field3: "",
-  field7: "",
-  startTime: "",
-  endTime: ""
-});
-const selectedIds = ref<string[]>([]);
-const pagination = ref({
-  page: 1,
-  size: 10,
-  total: 0
-});
-
-const getCategoryName = (code: string) => categoryMap[code] || "";
-
-const formatDate = (dateStr?: string) => {
-  if (!dateStr) return "";
-  return new Date(dateStr).toLocaleDateString("zh-CN");
+// 格式化日期
+const formatDate = (timestamp: number) => {
+  if (!timestamp) return "";
+  const date = new Date(timestamp);
+  return date.toISOString().split("T")[0];
 };
 
+// 获取类别名称
+const getCategoryName = (code: string) => {
+  return categoryMap[code] || "";
+};
+
+// 获取审批状态类型
 const getStatusType = (status: string) => {
   switch (status) {
     case "合格":
@@ -102,16 +121,21 @@ const getStatusType = (status: string) => {
   }
 };
 
-const rowClassName = ({ row }: { row: ToolItem }) => {
-  return row.field7 === "过期" ? "row-expired" : "";
+// 获取表格行样式
+const tableRowClassName = ({ row }: { row: ToolItem }) => {
+  if (row.field7 === "过期") {
+    return "warning-row";
+  }
+  return "";
 };
 
+// 获取数据
 async function fetchData() {
   loading.value = true;
   try {
     const params = new URLSearchParams({
-      page: String(pagination.value.page - 1),
-      size: String(pagination.value.size)
+      page: String(currentPage.value),
+      size: String(pageSize.value)
     });
 
     if (searchForm.value.field1) {
@@ -126,20 +150,13 @@ async function fetchData() {
     if (searchForm.value.field7) {
       params.append("field7", searchForm.value.field7);
     }
-    if (searchForm.value.startTime) {
-      params.append("beginTime", searchForm.value.startTime);
-    }
-    if (searchForm.value.endTime) {
-      params.append("endTime", searchForm.value.endTime);
-    }
 
-    const response = await fetch(
-      `/sft/cont/tool/list.json?${params.toString()}`
-    );
+    const response = await fetch(`/sft/cont/tool/list?${params.toString()}`);
     const data: ApiResponse = await response.json();
+
     if (data.success) {
       tableData.value = data.t.content;
-      pagination.value.total = data.t.totalElements;
+      total.value = data.t.totalElements;
     } else {
       ElMessage.error("获取数据失败");
     }
@@ -151,11 +168,13 @@ async function fetchData() {
   }
 }
 
+// 查询
 function handleSearch() {
-  pagination.value.page = 1;
+  currentPage.value = 1;
   fetchData();
 }
 
+// 重置
 function handleReset() {
   searchForm.value = {
     field1: "",
@@ -165,70 +184,76 @@ function handleReset() {
     startTime: "",
     endTime: ""
   };
-  pagination.value.page = 1;
+  currentPage.value = 1;
   fetchData();
 }
 
+// 导出
 function handleExport() {
   ElMessage.info("导出功能开发中");
 }
 
-function handleSelectionChange(selection: ToolItem[]) {
-  selectedIds.value = selection.map(item => item.id);
-}
-
-async function handleDelete(row: ToolItem) {
-  try {
-    await ElMessageBox.confirm("确认删除？", "提示", {
-      confirmButtonText: "确定",
-      cancelButtonText: "取消",
-      type: "warning"
-    });
-    ElMessage.success("删除成功");
-    fetchData();
-  } catch {
-    // 用户取消
-  }
-}
-
-async function handleBatchDelete() {
-  if (selectedIds.value.length === 0) {
-    ElMessage.warning("请选择要删除的数据");
+// 批量删除
+function handleBatchDelete() {
+  if (selectedRows.value.length === 0) {
+    ElMessage.warning("请选择要删除的台账！");
     return;
   }
-  try {
-    await ElMessageBox.confirm(
-      `确认删除选中的 ${selectedIds.value.length} 条数据？`,
-      "提示",
-      {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }
-    );
-    ElMessage.success("删除成功");
-    selectedIds.value = [];
-    fetchData();
-  } catch {
-    // 用户取消
-  }
+
+  ElMessageBox.confirm("确认删除？", "提示", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    type: "warning"
+  })
+    .then(() => {
+      ElMessage.success("删除成功！");
+      selectedRows.value = [];
+      fetchData();
+    })
+    .catch(() => {
+      // 取消删除
+    });
 }
 
-function handleQrCode(row: ToolItem) {
+// 删除单行
+function handleDelete(row: ToolItem) {
+  ElMessageBox.confirm("确认删除？", "提示", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    type: "warning"
+  })
+    .then(() => {
+      ElMessage.success("删除成功！");
+      fetchData();
+    })
+    .catch(() => {
+      // 取消删除
+    });
+}
+
+// 显示二维码
+function handleQrcode(row: ToolItem) {
   if (row.field7 !== "合格") {
     ElMessage.warning("审批不合格或已过期！");
     return;
   }
-  ElMessage.info("二维码功能开发中");
+  ElMessage.info(`二维码功能开发中 - 序列号: ${row.field}`);
 }
 
-function handleSizeChange(size: number) {
-  pagination.value.size = size;
+// 选择变化
+function handleSelectionChange(selection: ToolItem[]) {
+  selectedRows.value = selection;
+}
+
+// 分页变化
+function handlePageChange(page: number) {
+  currentPage.value = page;
   fetchData();
 }
 
-function handleCurrentChange(page: number) {
-  pagination.value.page = page;
+function handleSizeChange(size: number) {
+  pageSize.value = size;
+  currentPage.value = 1;
   fetchData();
 }
 
@@ -247,12 +272,7 @@ onMounted(() => {
       </template>
 
       <!-- 搜索表单 -->
-      <el-form
-        ref="searchFormRef"
-        :model="searchForm"
-        inline
-        class="search-form"
-      >
+      <el-form :model="searchForm" inline class="search-form">
         <el-form-item label="申请单位">
           <el-input
             v-model="searchForm.field3"
@@ -269,7 +289,7 @@ onMounted(() => {
             value-format="YYYY-MM-DD"
             style="width: 140px"
           />
-          <span class="date-separator">-</span>
+          <span class="mx-2">-</span>
           <el-date-picker
             v-model="searchForm.endTime"
             type="date"
@@ -294,7 +314,7 @@ onMounted(() => {
             style="width: 180px"
           >
             <el-option
-              v-for="item in categoryOptions"
+              v-for="item in CATEGORY_OPTIONS"
               :key="item.value"
               :label="item.label"
               :value="item.value"
@@ -309,32 +329,34 @@ onMounted(() => {
             style="width: 120px"
           >
             <el-option
-              v-for="item in statusOptions"
+              v-for="item in STATUS_OPTIONS"
               :key="item.value"
               :label="item.label"
               :value="item.value"
             />
           </el-select>
         </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="handleSearch">
-            <el-icon><Search /></el-icon>
-            查询
-          </el-button>
-          <el-button @click="handleReset">
-            <el-icon><Refresh /></el-icon>
-            重置
-          </el-button>
-          <el-button @click="handleExport">
-            <el-icon><Download /></el-icon>
-            导出
-          </el-button>
-          <el-button type="danger" @click="handleBatchDelete">
-            <el-icon><Delete /></el-icon>
-            删除
-          </el-button>
-        </el-form-item>
       </el-form>
+
+      <!-- 操作按钮 -->
+      <div class="mb-4">
+        <el-button type="primary" @click="handleSearch">
+          <el-icon><Search /></el-icon>
+          查询
+        </el-button>
+        <el-button @click="handleReset">
+          <el-icon><RefreshLeft /></el-icon>
+          重置
+        </el-button>
+        <el-button type="success" @click="handleExport">
+          <el-icon><Download /></el-icon>
+          导出
+        </el-button>
+        <el-button type="danger" @click="handleBatchDelete">
+          <el-icon><Delete /></el-icon>
+          删除
+        </el-button>
+      </div>
 
       <!-- 数据表格 -->
       <el-table
@@ -342,15 +364,15 @@ onMounted(() => {
         :data="tableData"
         stripe
         border
-        :row-class-name="rowClassName"
-        style="width: 100%; margin-top: 16px"
+        :row-class-name="tableRowClassName"
+        style="width: 100%"
         @selection-change="handleSelectionChange"
       >
-        <el-table-column type="selection" width="55" align="center" />
+        <el-table-column type="selection" width="50" align="center" />
         <el-table-column type="index" label="序号" width="60" align="center" />
         <el-table-column prop="field" label="序列号" min-width="140" />
         <el-table-column prop="field1" label="名称" min-width="120" />
-        <el-table-column prop="field2" label="类别" width="160" align="center">
+        <el-table-column label="类别" width="150" align="center">
           <template #default="{ row }">
             {{ getCategoryName(row.field2) }}
           </template>
@@ -358,19 +380,14 @@ onMounted(() => {
         <el-table-column prop="field3" label="型号" width="100" />
         <el-table-column prop="field4" label="使用人" width="100" />
         <el-table-column prop="field5" label="负责人" width="100" />
-        <el-table-column
-          prop="field7"
-          label="审批状态"
-          width="100"
-          align="center"
-        >
+        <el-table-column label="审批状态" width="100" align="center">
           <template #default="{ row }">
             <el-tag :type="getStatusType(row.field7)">
               {{ row.field7 }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="审批时间" width="120" align="center">
+        <el-table-column label="审批时间" width="110" align="center">
           <template #default="{ row }">
             {{ formatDate(row.field8) }}
           </template>
@@ -380,7 +397,7 @@ onMounted(() => {
             {{ row.field12?.ushow || "" }}
           </template>
         </el-table-column>
-        <el-table-column label="申请单位" width="140" align="center">
+        <el-table-column label="申请单位" width="110" align="center">
           <template #default="{ row }">
             {{ row.field9?.name || "" }}
           </template>
@@ -390,33 +407,29 @@ onMounted(() => {
             {{ row.field10?.ushow || "" }}
           </template>
         </el-table-column>
-        <el-table-column label="申请时间" width="120" align="center">
+        <el-table-column label="申请时间" width="110" align="center">
           <template #default="{ row }">
             {{ formatDate(row.field11) }}
           </template>
         </el-table-column>
-        <el-table-column
-          prop="field6"
-          label="备注"
-          min-width="120"
-          show-overflow-tooltip
-        />
-        <el-table-column label="操作" width="140" align="center" fixed="right">
+        <el-table-column label="照片" width="80" align="center">
           <template #default="{ row }">
-            <el-button
-              link
-              type="primary"
+            <el-tag
+              v-if="row.pics && row.pics.length > 0"
+              type="info"
               size="small"
-              @click="handleQrCode(row)"
             >
+              {{ row.pics.length }}张
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="field6" label="备注" min-width="120" />
+        <el-table-column label="操作" width="120" fixed="right" align="center">
+          <template #default="{ row }">
+            <el-button type="primary" size="small" @click="handleQrcode(row)">
               二维码
             </el-button>
-            <el-button
-              link
-              type="danger"
-              size="small"
-              @click="handleDelete(row)"
-            >
+            <el-button type="danger" size="small" @click="handleDelete(row)">
               删除
             </el-button>
           </template>
@@ -424,16 +437,17 @@ onMounted(() => {
       </el-table>
 
       <!-- 分页 -->
-      <el-pagination
-        v-model:current-page="pagination.page"
-        v-model:page-size="pagination.size"
-        :total="pagination.total"
-        :page-sizes="[10, 20, 50, 100]"
-        layout="total, sizes, prev, pager, next, jumper"
-        style=" justify-content: flex-end;margin-top: 16px"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-      />
+      <div class="mt-4 flex justify-end">
+        <el-pagination
+          v-model:current-page="currentPage"
+          v-model:page-size="pageSize"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="total"
+          layout="total, sizes, prev, pager, next, jumper"
+          @current-change="handlePageChange"
+          @size-change="handleSizeChange"
+        />
+      </div>
     </el-card>
   </div>
 </template>
@@ -449,17 +463,10 @@ onMounted(() => {
 }
 
 .search-form {
-  .el-form-item {
-    margin-bottom: 12px;
-  }
+  margin-bottom: 16px;
 }
 
-.date-separator {
-  margin: 0 8px;
-  color: var(--el-text-color-secondary);
-}
-
-:deep(.row-expired) {
-  color: var(--el-color-danger);
+:deep(.el-table .warning-row) {
+  color: #f56c6c;
 }
 </style>

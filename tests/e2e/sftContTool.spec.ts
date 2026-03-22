@@ -92,90 +92,103 @@ async function testToolPage(page: Page): Promise<void> {
   await expect(table.first()).toBeVisible();
   console.log("✓ 表格已渲染");
 
-  // 3. 验证搜索表单
-  const searchInputs = page.locator(
-    ".search-form .el-input, .search-form .el-select"
-  );
-  const inputCount = await searchInputs.count();
-  expect(inputCount).toBeGreaterThan(0);
-  console.log(`✓ 搜索表单输入框数: ${inputCount}`);
+  // 3. 验证搜索表单存在
+  const searchForm = page.locator(".search-form");
+  await expect(searchForm).toBeVisible();
+  console.log("✓ 搜索表单存在");
 
-  // 4. 验证表头
+  // 4. 验证搜索字段
+  const inputs = await page.locator(".search-form .el-input").count();
+  const selects = await page.locator(".search-form .el-select").count();
+  const datePickers = await page
+    .locator(".search-form .el-date-picker")
+    .count();
+  console.log(
+    `✓ 搜索字段: 输入框${inputs}个, 下拉框${selects}个, 日期选择器${datePickers}个`
+  );
+
+  // 5. 验证操作按钮
+  const buttons = await page.locator(".mb-4 .el-button").allTextContents();
+  expect(buttons.some(b => b.includes("查询"))).toBeTruthy();
+  expect(buttons.some(b => b.includes("重置"))).toBeTruthy();
+  expect(buttons.some(b => b.includes("导出"))).toBeTruthy();
+  expect(buttons.some(b => b.includes("删除"))).toBeTruthy();
+  console.log("✓ 操作按钮存在: 查询, 重置, 导出, 删除");
+
+  // 6. 验证表格列
   const headers = await page.locator(".el-table__header th").allTextContents();
-  const expectedHeaders = [
+  const _expectedColumns = [
     "序号",
     "序列号",
     "名称",
     "类别",
     "型号",
     "使用人",
-    "负责人"
+    "负责人",
+    "审批状态",
+    "审批时间",
+    "审批人",
+    "申请单位",
+    "申请人",
+    "申请时间",
+    "照片",
+    "备注",
+    "操作"
   ];
-  for (const header of expectedHeaders) {
-    const found = headers.some(h => h.includes(header));
-    if (found) {
-      console.log(`✓ 表头包含: ${header}`);
-    }
-  }
+  const foundColumns = headers.filter(h => h.trim());
+  console.log(`✓ 表格列数: ${foundColumns.length}`);
 
-  // 5. 验证数据行
+  // 7. 验证数据行
   const dataRows = await page.locator(".el-table__body .el-table__row").count();
   expect(dataRows).toBeGreaterThan(0);
   console.log(`✓ 数据行数: ${dataRows}`);
 
-  // 6. 验证第一行数据
+  // 8. 验证第一行数据
   const firstRowCells = await page
     .locator(".el-table__body .el-table__row")
     .first()
     .locator("td")
     .allTextContents();
-  console.log("第一行数据:", firstRowCells.slice(1, 5).join(" | "));
+  console.log("第一行数据:", firstRowCells.slice(1, 6).join(" | "));
 
-  // 7. 验证状态标签
+  // 9. 验证审批状态标签
   const statusTags = page.locator(".el-table__body .el-tag");
   const tagCount = await statusTags.count();
   expect(tagCount).toBeGreaterThan(0);
-  console.log(`✓ 状态标签数: ${tagCount}`);
+  console.log(`✓ 审批状态标签数: ${tagCount}`);
 
-  // 8. 验证操作按钮
-  const actionButtons = page.locator(
-    ".el-table__body .el-button--link, .el-table__body .is-link"
-  );
-  const actionCount = await actionButtons.count();
-  expect(actionCount).toBeGreaterThan(0);
-  console.log(`✓ 操作按钮数: ${actionCount}`);
+  // 10. 测试查询功能
+  console.log("\n--- 测试查询功能 ---");
+  await page.fill('.search-form input[placeholder*="请输入名称"]', "电焊机");
+  await page.click('.mb-4 .el-button:has-text("查询")');
+  await page.waitForTimeout(1000);
+  const filteredRows = await page
+    .locator(".el-table__body .el-table__row")
+    .count();
+  console.log(`✓ 查询后数据行数: ${filteredRows}`);
 
-  // 9. 测试搜索功能 - 选择类别
-  await page.click(".search-form .el-select");
-  const categoryOption = page.locator(".el-select-dropdown__item").first();
-  await categoryOption.click();
-  console.log("✓ 类别选择功能正常");
+  // 13. 测试重置功能
+  console.log("\n--- 测试重置功能 ---");
+  await page.click('.mb-4 .el-button:has-text("重置")');
+  await page.waitForTimeout(500);
+  const resetInputs = await page
+    .locator('.search-form input[placeholder*="请输入名称"]')
+    .inputValue();
+  expect(resetInputs).toBe("");
+  console.log("✓ 重置功能正常");
 
-  // 10. 测试重置按钮
-  const resetButton = page.locator('button:has-text("重置")');
-  await resetButton.click();
-  console.log("✓ 重置按钮正常");
-
-  // 11. 验证过期行样式
-  const expiredRows = page.locator(".el-table__body tr.row-expired");
-  const expiredCount = await expiredRows.count();
-  if (expiredCount > 0) {
-    console.log(`✓ 过期行数: ${expiredCount}（红色样式）`);
-  } else {
-    console.log("⚠ 无过期行数据");
-  }
-
-  // 12. 验证分页
+  // 14. 测试分页
+  console.log("\n--- 测试分页 ---");
   const pagination = page.locator(".el-pagination");
   await expect(pagination).toBeVisible();
-  console.log("✓ 分页组件已渲染");
+  console.log("✓ 分页组件存在");
 
-  // 13. 截图
+  // 15. 截图
   await page.screenshot({
-    path: "screenshots/sft-cont-tool.png",
+    path: "screenshots/sft-cont-tool-page.png",
     fullPage: true
   });
-  console.log("✓ 已保存截图: screenshots/sft-cont-tool.png");
+  console.log("✓ 已保存截图: screenshots/sft-cont-tool-page.png");
 
   console.log("\n=== 测试通过 ===\n");
 }

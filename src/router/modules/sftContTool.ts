@@ -8,7 +8,7 @@ export default {
   meta: {
     icon: "ep:tools",
     title: "工器具管理",
-    rank: 18
+    rank: 8
   },
   children: [
     {
