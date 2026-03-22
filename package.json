@@ -23,6 +23,7 @@
     "test:e2e:train:plantype:index": "npx tsx tests/e2e/trainPlantype.spec.ts",
     "test:e2e:work:doccamera:index": "npx tsx tests/e2e/doccamera.spec.ts",
     "test:e2e:data:gds:index2": "npx tsx tests/e2e/dataGdsIndex2.spec.ts",
+    "test:e2e:sys:acl:index": "npx tsx tests/e2e/sysAcl.spec.ts",
     "prepare": "husky",
     "preinstall": "npx only-allow pnpm"
   },
