@@ -103,6 +103,7 @@
     "test:e2e:sft:insp:tl": "npx tsx tests/e2e/sftInspTl.spec.ts",
     "test:e2e:sft:insp:cl": "npx tsx tests/e2e/sftInspCl.spec.ts",
     "test:e2e:resum:content": "npx tsx tests/e2e/resumContent.spec.ts",
+    "test:e2e:sft:risk:target": "npx tsx tests/e2e/sftRiskTarget.spec.ts",
     "prepare": "husky",
     "preinstall": "npx only-allow pnpm"
   },
