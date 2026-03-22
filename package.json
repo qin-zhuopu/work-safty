@@ -111,6 +111,8 @@
     "test:e2e:sft:danger:analysis": "npx tsx tests/e2e/sftDangerAnalysis.spec.ts",
     "test:e2e:sft:work:doc:tmpl": "npx tsx tests/e2e/sftWorkDocTmpl.spec.ts",
     "test:e2e:sft:data:silent:area": "npx tsx tests/e2e/sftDataSilentArea.spec.ts",
+    "test:e2e:sft:behavior:safe:frequency": "npx tsx tests/e2e/sftBehaviorSafeFrequency.spec.ts",
+    "test:e2e:sft:work:monitor:detail": "npx tsx tests/e2e/sftWorkMonitorDetail.spec.ts",
     "test:e2e:login": "npx tsx tests/e2e/login.spec.ts",
     "prepare": "husky",
     "preinstall": "npx only-allow pnpm"
